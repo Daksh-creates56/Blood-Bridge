@@ -1,7 +1,9 @@
+
 'use client';
 
+import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { Moon, Sun, Award } from 'lucide-react';
+import { Moon, Sun, Award, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -15,6 +17,21 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <p className="mt-2 text-muted-foreground">Manage your application preferences.</p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Navigation</CardTitle>
+          <CardDescription>Quickly navigate to other parts of the application.</CardDescription>
+        </CardHeader>
+        <CardContent>
+           <Button asChild variant="outline">
+              <Link href="/">
+                <Home className="mr-2 h-4 w-4" />
+                Go to Welcome Page
+              </Link>
+            </Button>
+        </CardContent>
+      </Card>
       
       <Card>
         <CardHeader>
