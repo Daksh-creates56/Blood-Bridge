@@ -9,9 +9,14 @@ import type { Hospital } from '@/lib/types';
 
 interface MapViewProps {
   hospital: Hospital;
+  isOpen: boolean;
 }
 
-export default function MapView({ hospital }: MapViewProps) {
+export default function MapView({ hospital, isOpen }: MapViewProps) {
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <MapContainer center={hospital.coordinates} zoom={16} scrollWheelZoom={false} className="h-full w-full">
       <LayersControl position="topright">

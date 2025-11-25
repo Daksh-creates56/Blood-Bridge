@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Star } from 'lucide-react';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -36,7 +35,7 @@ export function LocationDialog({ hospital, isOpen }: LocationDialogProps) {
           </div>
         </div>
         <div className="h-[400px] w-full rounded-md overflow-hidden border">
-          {isOpen && <MapView hospital={hospital} />}
+           <MapView hospital={hospital} isOpen={isOpen} />
         </div>
       </div>
     </>
