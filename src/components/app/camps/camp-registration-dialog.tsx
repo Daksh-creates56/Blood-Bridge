@@ -23,7 +23,8 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Ticket, Download } from 'lucide-react';
+import { Loader2, Ticket, Download, User, Mail, QrCode } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 interface CampRegistrationDialogProps {
   camp: DonationCamp;
@@ -69,16 +70,24 @@ export function CampRegistrationDialog({ camp }: CampRegistrationDialogProps) {
   const handleDownloadTicket = async () => {
     if (!ticketRef.current) return;
 
-    const canvas = await html2canvas(ticketRef.current, { scale: 2 });
+    const canvas = await html2canvas(ticketRef.current, { 
+      scale: 3, 
+      backgroundColor: null, // Use transparent background
+      useCORS: true
+    });
     const imgData = canvas.toDataURL('image/png');
     
+    // Calculate PDF dimensions to maintain aspect ratio
+    const pdfWidth = 210; // A4 width in mm
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
     const pdf = new jsPDF({
       orientation: 'portrait',
-      unit: 'px',
-      format: [canvas.width, canvas.height]
+      unit: 'mm',
+      format: [pdfWidth, pdfHeight]
     });
     
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     pdf.save(`Donation-Ticket-${camp.name.replace(/ /g, '-')}.pdf`);
   };
 
@@ -96,45 +105,47 @@ export function CampRegistrationDialog({ camp }: CampRegistrationDialogProps) {
       <DialogTrigger asChild>
         <Button className="flex-1">Book a Slot</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => !isLoading && e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>
             {ticketData ? 'Your E-Ticket' : `Book Slot at ${camp.name}`}
           </DialogTitle>
           <DialogDescription>
             {ticketData 
-              ? 'Present this ticket at the donation camp.'
+              ? 'Present this ticket at the donation camp. You can also download it as a PDF.'
               : 'Please fill in your details to confirm your slot.'}
           </DialogDescription>
         </DialogHeader>
 
         {ticketData ? (
-          <div>
-            <div ref={ticketRef} className="bg-background p-6 border rounded-lg">
-                <div className="text-center pb-4 border-b">
+          <div className="space-y-4">
+            <div ref={ticketRef} className="bg-muted/30 p-4 border rounded-xl space-y-4 text-foreground">
+                <div className="text-center">
                     <h3 className="font-bold text-lg text-primary">Blood Donation E-Ticket</h3>
-                    <p className="text-sm font-semibold">{camp.name}</p>
+                    <p className="font-semibold text-sm">{camp.name}</p>
                     <p className="text-xs text-muted-foreground">{camp.address}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 py-4 border-b">
-                    <div>
-                        <p className="text-xs text-muted-foreground">Name</p>
-                        <p className="font-semibold">{ticketData.name}</p>
+                <Separator />
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground flex items-center gap-1"><User size={12} /> Name</p>
+                        <p className="font-semibold text-sm truncate">{ticketData.name}</p>
                     </div>
-                     <div>
-                        <p className="text-xs text-muted-foreground">Email</p>
-                        <p className="font-semibold">{ticketData.email}</p>
+                     <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Mail size={12}/> Email</p>
+                        <p className="font-semibold text-sm truncate">{ticketData.email}</p>
                     </div>
                 </div>
-                 <div className="flex items-center justify-center pt-4 text-center">
-                    <div>
-                        <p className="text-xs text-muted-foreground mb-2">Scan for verification</p>
-                        <QRCode value={`DONOR:${ticketData.name}\nCAMP:${camp.name}`} size={96} />
+                 <Separator />
+                 <div className="flex flex-col items-center justify-center pt-2 text-center">
+                     <p className="text-xs font-medium text-muted-foreground flex items-center gap-1 mb-2"><QrCode size={12}/> Scan for Verification</p>
+                    <div className="bg-white p-2 rounded-md shadow-md">
+                      <QRCode value={`DONOR:${ticketData.name}\nCAMP:${camp.name}`} size={128} renderAs="svg" />
                     </div>
                  </div>
             </div>
-             <Button onClick={handleDownloadTicket} className="w-full mt-4">
-                <Download className="mr-2 h-4 w-4" /> Download Ticket
+             <Button onClick={handleDownloadTicket} className="w-full">
+                <Download className="mr-2 h-4 w-4" /> Download Ticket as PDF
             </Button>
           </div>
         ) : (
@@ -199,7 +210,7 @@ export function CampRegistrationDialog({ camp }: CampRegistrationDialogProps) {
         )}
         
         {ticketData && (
-             <DialogFooter className="sm:justify-center">
+             <DialogFooter className="sm:justify-center pt-4">
                 <Button variant="outline" onClick={resetAndClose}>Close</Button>
             </DialogFooter>
         )}
