@@ -10,7 +10,7 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 p-4 md:p-0">
+    <div className="max-w-2xl mx-auto space-y-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <p className="mt-2 text-muted-foreground">Manage your application preferences.</p>

@@ -99,7 +99,7 @@ export default function DonationCampsPage() {
   }
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative h-full w-full -m-4 md:-m-6">
       <div className="absolute inset-0 z-0">
           <CampMapView 
             camps={camps} 

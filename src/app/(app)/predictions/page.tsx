@@ -95,7 +95,7 @@ export default function PredictionsPage() {
   }
 
   return (
-    <div className="space-y-8 p-4 md:p-6">
+    <div className="space-y-8">
       <Card>
         <CardHeader>
           <CardTitle>AI Blood Shortage Prediction</CardTitle>
