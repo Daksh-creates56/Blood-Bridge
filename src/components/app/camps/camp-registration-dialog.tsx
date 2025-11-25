@@ -126,14 +126,14 @@ export function CampRegistrationDialog({ camp }: CampRegistrationDialogProps) {
                     <p className="text-xs text-muted-foreground">{camp.address}</p>
                 </div>
                 <Separator />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                     <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground flex items-center gap-1"><User size={12} /> Name</p>
-                        <p className="font-semibold text-sm truncate">{ticketData.name}</p>
+                        <p className="font-semibold text-sm">{ticketData.name}</p>
                     </div>
                      <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Mail size={12}/> Email</p>
-                        <p className="font-semibold text-sm truncate">{ticketData.email}</p>
+                        <p className="font-semibold text-sm break-all">{ticketData.email}</p>
                     </div>
                 </div>
                  <Separator />
