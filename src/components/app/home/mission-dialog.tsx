@@ -41,7 +41,8 @@ const features = [
         icon: FlaskConical,
         title: "AI-Powered Predictions",
         description: "Leverage the power of artificial intelligence to forecast potential blood shortages. Our predictive analytics help you proactively manage inventory and anticipate future needs before they become critical.",
-        image: placeholderData.placeholderImages.find(img => img.id === 'feature-predictions')
+        image: placeholderData.placeholderImages.find(img => img.id === 'feature-predictions'),
+        videoUrl: "https://media.istockphoto.com/id/1491463133/video/illustrative-3d-animation-of-neural-network-concept-chatbot-artificial-intelligence-deep.mp4?s=mp4-640x640-is&k=20&c=GfH4iLh-gzyr0Ii2-LNoGFbzOdRspiD3pqzI9_oRgqg="
 
     },
     {
