@@ -55,9 +55,25 @@ export function CampMapView({ camps, view, userLocation, selectedCamp, onSelectC
         zoom: view.zoom,
       });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(mapInstance.current);
+
+      const satelliteLayer = L.tileLayer(
+        'https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+        {
+          maxZoom: 20,
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; <a href="https://www.google.com/permissions/geoguidelines.html">Google Maps</a>',
+        }
+      );
+
+      const baseMaps = {
+        "Street View": streetLayer,
+        "Satellite View": satelliteLayer
+      };
+
+      L.control.layers(baseMaps).addTo(mapInstance.current);
 
       // Invalidate size on container resize
       const mapContainer = mapRef.current;
