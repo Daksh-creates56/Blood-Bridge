@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -12,7 +13,7 @@ interface MapViewProps {
   camps: DonationCamp[];
   selectedCamp: DonationCamp | null;
   userLocation?: [number, number] | null;
-  panToLocation?: [number, number] | null;
+  onSelectCamp: (camp: DonationCamp) => void;
 }
 
 const userIcon = new L.Icon({
@@ -34,7 +35,7 @@ const selectedIcon = new L.Icon({
 });
 
 
-export default function CampMapView({ camps, selectedCamp, userLocation, panToLocation }: MapViewProps) {
+export default function CampMapView({ camps, selectedCamp, userLocation, onSelectCamp }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const markersRef = useRef<Record<string, L.Marker>>({});
@@ -75,13 +76,14 @@ export default function CampMapView({ camps, selectedCamp, userLocation, panToLo
           const marker = L.marker(camp.coordinates)
             .addTo(mapInstance.current!)
             .bindPopup(`<b>${camp.name}</b><br/>${camp.location}`);
+          marker.on('click', () => onSelectCamp(camp));
           markersRef.current[camp.id] = marker;
       });
     }
 
-  }, [camps]); 
+  }, [camps, onSelectCamp]); 
 
-  // Handle user location marker
+  // Handle user location marker and map view
   useEffect(() => {
       if(mapInstance.current && userLocation) {
           if (userMarkerRef.current) {
@@ -91,6 +93,8 @@ export default function CampMapView({ camps, selectedCamp, userLocation, panToLo
                 .addTo(mapInstance.current)
                 .bindPopup('<b>Your Location</b>');
           }
+          // Only fly to user's location when it's first determined
+          mapInstance.current.flyTo(userLocation, 14, { animate: true, duration: 1.5 });
       }
   }, [userLocation]);
 
@@ -107,21 +111,21 @@ export default function CampMapView({ camps, selectedCamp, userLocation, panToLo
         const selectedMarker = markersRef.current[selectedCamp.id];
         if (selectedMarker) {
           selectedMarker.setIcon(selectedIcon);
-          selectedMarker.openPopup();
+          // Do not open popup automatically, to avoid covering user location
         }
       }
     }
   }, [selectedCamp]);
 
-  // Handle panning the map
+  // Pan to selected camp if it's not the user's current nearest
   useEffect(() => {
-    if (mapInstance.current && panToLocation) {
-        mapInstance.current.flyTo(panToLocation, 15, {
+    if (mapInstance.current && selectedCamp && (!userLocation)) {
+        mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
             animate: true,
             duration: 1.5
         });
     }
-  }, [panToLocation])
+  }, [selectedCamp, userLocation])
 
 
   return <div ref={mapRef} className="h-full w-full" />;

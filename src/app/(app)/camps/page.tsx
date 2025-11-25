@@ -62,15 +62,13 @@ export default function DonationCampsPage() {
   const [nearestCamp, setNearestCamp] = useState<DonationCamp | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [panToLocation, setPanToLocation] = useState<[number, number] | null>(null);
-
+  
   const sortedCamps = useMemo(() => {
     return [...camps].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [camps]);
 
   const handleSelectCamp = useCallback((camp: DonationCamp) => {
     setSelectedCamp(camp);
-    setPanToLocation(camp.coordinates);
   }, []);
 
   const findNearestCamp = () => {
@@ -89,8 +87,7 @@ export default function DonationCampsPage() {
         const { latitude, longitude } = position.coords;
         const currentUserLocation: [number, number] = [latitude, longitude];
         setUserLocation(currentUserLocation);
-        setPanToLocation(currentUserLocation);
-
+        
         let closestCamp: DonationCamp | null = null;
         let minDistance = Infinity;
 
@@ -109,6 +106,7 @@ export default function DonationCampsPage() {
 
         setNearestCamp(closestCamp);
         if (closestCamp) {
+          // We set selected camp here to highlight it, the map will handle the view
           setSelectedCamp(closestCamp);
         }
         setIsLocating(false);
@@ -134,12 +132,10 @@ export default function DonationCampsPage() {
   };
   
   useEffect(() => {
-    // Only set the first camp as selected if no camp has been selected yet.
-    // This avoids overriding a user-driven selection or the nearest camp selection.
-    if(!selectedCamp && !userLocation && sortedCamps.length > 0) {
+    if(!selectedCamp && sortedCamps.length > 0) {
       setSelectedCamp(sortedCamps[0]);
     }
-  }, [sortedCamps, selectedCamp, userLocation]);
+  }, [sortedCamps, selectedCamp]);
 
 
   return (
@@ -192,7 +188,7 @@ export default function DonationCampsPage() {
                 camps={sortedCamps}
                 selectedCamp={selectedCamp}
                 userLocation={userLocation}
-                panToLocation={panToLocation}
+                onSelectCamp={handleSelectCamp}
             />
         </div>
     </div>
