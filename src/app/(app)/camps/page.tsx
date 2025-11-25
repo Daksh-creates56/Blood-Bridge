@@ -177,8 +177,8 @@ export default function DonationCampsPage() {
       <div className="flex flex-col md:flex-row h-[calc(100vh-var(--header-height,6rem)-2rem)] w-full gap-4">
         
         {/* Left Column: List of Camps */}
-        <div className="flex flex-col w-full md:w-1/2 lg:w-2/5 space-y-4 h-full">
-            <div className="flex-shrink-0">
+        <div className="flex flex-col w-full md:w-1/2 lg:w-2/5 xl:w-1/3 h-full">
+            <div className="flex-shrink-0 p-1">
               <Button onClick={findNearestCamp} disabled={isLocating} className="w-full shadow-lg">
                 {isLocating ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Locating...</>
@@ -195,7 +195,7 @@ export default function DonationCampsPage() {
               )}
             </div>
 
-            <ScrollArea className="flex-grow rounded-lg border">
+            <ScrollArea className="flex-grow mt-4 rounded-lg border">
               <div className="p-4 space-y-4">
                 {sortedCamps.length > 0 ? (
                   sortedCamps.map(camp => (
@@ -219,16 +219,14 @@ export default function DonationCampsPage() {
         </div>
 
         {/* Right Column: Map View */}
-        <div className="w-full md:w-1/2 lg:w-3/5 h-[400px] md:h-full">
-           <div className="h-full w-full rounded-lg overflow-hidden border">
-              <CampMapView 
-                camps={sortedCamps}
-                selectedCamp={selectedCamp}
-                userLocation={userLocation}
-                onSelectCamp={handleSelectCamp}
-                view={mapView}
-              />
-            </div>
+        <div className="w-full md:w-1/2 lg:w-3/5 xl:w-2/3 h-[400px] md:h-full rounded-lg overflow-hidden border relative">
+          <CampMapView 
+            camps={sortedCamps}
+            selectedCamp={selectedCamp}
+            userLocation={userLocation}
+            onSelectCamp={handleSelectCamp}
+            view={mapView}
+          />
         </div>
 
       </div>
