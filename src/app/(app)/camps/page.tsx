@@ -99,14 +99,16 @@ export default function DonationCampsPage() {
   }
 
   return (
-    <div className="relative h-[calc(100vh-theme(spacing.16))] w-full">
-      <CampMapView 
-        camps={camps} 
-        view={mapView} 
-        userLocation={userLocation} 
-        selectedCamp={selectedCamp}
-        onSelectCamp={handleSelectCamp}
-      />
+    <div className="relative h-full w-full">
+      <div className="absolute inset-0 z-0">
+          <CampMapView 
+            camps={camps} 
+            view={mapView} 
+            userLocation={userLocation} 
+            selectedCamp={selectedCamp}
+            onSelectCamp={handleSelectCamp}
+          />
+      </div>
       
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
         <Button onClick={findNearestCamp} disabled={isLocating} size="lg" className="shadow-lg">

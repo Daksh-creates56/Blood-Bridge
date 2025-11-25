@@ -13,10 +13,10 @@ export default function AppLayout({
       <Sidebar>
         <SidebarNav />
       </Sidebar>
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col h-screen">
         <AppHeader />
         <SidebarInset>
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+          <main className="flex-1 overflow-auto">{children}</main>
         </SidebarInset>
       </div>
     </SidebarProvider>
