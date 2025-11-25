@@ -70,7 +70,8 @@ const features = [
         icon: BarChart2,
         title: "Insightful Analytics",
         description: "Dive deep into historical data with our comprehensive analytics page. Track donation trends, request patterns, and inventory metrics to optimize supply chain management.",
-        image: placeholderData.placeholderImages.find(img => img.id === 'feature-analytics')
+        image: placeholderData.placeholderImages.find(img => img.id === 'feature-analytics'),
+        videoUrl: "https://cdn.pixabay.com/video/2018/10/09/18629-294891323_large.mp4"
     },
 ]
 
