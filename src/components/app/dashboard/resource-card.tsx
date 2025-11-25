@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { UpdateUnitsDialog } from './update-units-dialog';
+import { LocationDialog } from './location-dialog';
 
 interface ResourceCardProps {
   resource: Resource;
@@ -51,10 +52,7 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
              <span className="text-sm text-muted-foreground"> units</span>
           </div>
         </div>
-        <div className="flex items-start gap-3 text-muted-foreground">
-          <MapPin className="mt-1 h-5 w-5 shrink-0" />
-          <span className="text-sm">{resource.location}</span>
-        </div>
+        <LocationDialog hospital={resource.hospital} />
       </CardContent>
       <CardFooter>
         <UpdateUnitsDialog resource={resource} onUpdate={onUpdate} />

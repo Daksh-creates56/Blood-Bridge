@@ -1,28 +1,29 @@
-import type { Resource, UrgentRequest, DonationCamp, Donor, BloodType } from './types';
+import type { Resource, UrgentRequest, DonationCamp, Donor, BloodType, Hospital } from './types';
 
-const locations = [
-  'D Y Patil Hospital, Nerul',
-  'Apollo Hospital, Belapur',
-  'Fortis Hiranandani, Vashi',
-  'MGM Hospital, Kamothe',
-  'Reliance Hospital, Kopar Khairane',
-  'Terna Speciality Hospital, Nerul',
-  'Cloudnine Hospital, Vashi',
-  'Surya Hospital, Nerul',
-  'MPCT Hospital, Sanpada',
-  'Sterling Wockhardt Hospital, Vashi',
-  'Medicover Hospitals, Kharghar',
-  'Motherhood Hospital, Kharghar',
-  'Ashirwad Hospital, Seawoods',
-  'Lakshdeep Hospital, Vashi',
-  'Sai Snehdeep Hospital, Kopar Khairane'
+const hospitals: Hospital[] = [
+  { name: 'D Y Patil Hospital', address: 'Sector 5, Nerul, Navi Mumbai', coordinates: [19.041, 73.022], rating: 5 },
+  { name: 'Apollo Hospital', address: 'Sector 23, CBD Belapur, Navi Mumbai', coordinates: [19.018, 73.03], rating: 5 },
+  { name: 'Fortis Hiranandani', address: 'Sector 10A, Vashi, Navi Mumbai', coordinates: [19.068, 73.001], rating: 5 },
+  { name: 'MGM Hospital', address: 'Sector 18, Kamothe, Panvel', coordinates: [19.016, 73.09], rating: 5 },
+  { name: 'Reliance Hospital', address: 'Thane-Belapur Road, Kopar Khairane', coordinates: [19.08, 73.01], rating: 5 },
+  { name: 'Terna Speciality Hospital', address: 'Sector 22, Nerul West, Navi Mumbai', coordinates: [19.034, 73.018], rating: 5 },
+  { name: 'Cloudnine Hospital', address: 'Sector 15, Vashi, Navi Mumbai', coordinates: [19.07, 72.998], rating: 5 },
+  { name: 'Surya Hospital', address: 'Sector 9, Nerul, Navi Mumbai', coordinates: [19.037, 73.025], rating: 5 },
+  { name: 'MPCT Hospital', address: 'Sector 14, Sanpada, Navi Mumbai', coordinates: [19.06, 73.008], rating: 5 },
+  { name: 'Sterling Wockhardt Hospital', address: 'Sector 7, Vashi, Navi Mumbai', coordinates: [19.075, 72.995], rating: 5 },
+  { name: 'Medicover Hospitals', address: 'Sector 10, Kharghar, Navi Mumbai', coordinates: [19.02, 73.065], rating: 5 },
+  { name: 'Motherhood Hospital', address: 'Sector 5, Kharghar, Navi Mumbai', coordinates: [19.03, 73.07], rating: 5 },
+  { name: 'Ashirwad Hospital', address: 'Sector 1, Seawoods, Nerul', coordinates: [19.03, 73.015], rating: 5 },
+  { name: 'Lakshdeep Hospital', address: 'Sector 9, Vashi, Navi Mumbai', coordinates: [19.072, 72.999], rating: 5 },
+  { name: 'Sai Snehdeep Hospital', address: 'Sector 1, Kopar Khairane', coordinates: [19.085, 73.005], rating: 5 }
 ];
+
 
 const bloodTypes: BloodType[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 // Generate mock resources
 export const initialResources: Resource[] = bloodTypes.flatMap((type, i) => 
-  locations.map((loc, j) => {
+  hospitals.map((hospital, j) => {
     const quantity = Math.floor(Math.random() * 100);
     let status: 'Available' | 'Low' | 'Critical' = 'Available';
     if (quantity < 10) status = 'Critical';
@@ -32,8 +33,9 @@ export const initialResources: Resource[] = bloodTypes.flatMap((type, i) =>
       id: `res-${i}-${j}`,
       bloodType: type,
       quantity,
-      location: loc,
+      location: hospital.name,
       status,
+      hospital,
     };
   })
 );
@@ -45,7 +47,7 @@ export const initialUrgentRequests: UrgentRequest[] = [
     bloodType: 'O-',
     quantity: 5,
     urgency: 'Critical',
-    hospitalName: 'Apollo Hospital, Belapur',
+    hospitalName: 'Apollo Hospital',
     location: 'Belapur, Navi Mumbai',
     broadcastRadius: '10km',
     createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
@@ -56,7 +58,7 @@ export const initialUrgentRequests: UrgentRequest[] = [
     bloodType: 'A+',
     quantity: 10,
     urgency: 'High',
-    hospitalName: 'Fortis Hiranandani, Vashi',
+    hospitalName: 'Fortis Hiranandani',
     location: 'Vashi, Navi Mumbai',
     broadcastRadius: '5km',
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -67,7 +69,7 @@ export const initialUrgentRequests: UrgentRequest[] = [
     bloodType: 'B+',
     quantity: 8,
     urgency: 'Moderate',
-    hospitalName: 'D Y Patil Hospital, Nerul',
+    hospitalName: 'D Y Patil Hospital',
     location: 'Nerul, Navi Mumbai',
     broadcastRadius: '10km',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -79,7 +81,7 @@ export const initialUrgentRequests: UrgentRequest[] = [
     bloodType: 'AB-',
     quantity: 3,
     urgency: 'Critical',
-    hospitalName: 'MGM Hospital, Kamothe',
+    hospitalName: 'MGM Hospital',
     location: 'Kamothe, Navi Mumbai',
     broadcastRadius: '10km',
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
@@ -131,7 +133,7 @@ export const initialDonors: Donor[] = donorNames.map((name, index) => ({
   id: `donor-${index + 1}`,
   name,
   bloodType: bloodTypes[index % bloodTypes.length],
-  location: locations[index % locations.length].split(',')[1].trim(),
+  location: hospitals[index % hospitals.length].name,
   lastDonation: new Date(Date.now() - (30 + index * 15) * 24 * 60 * 60 * 1000).toISOString(),
   contact: {
     phone: `+91 987654321${index}`,

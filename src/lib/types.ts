@@ -3,12 +3,20 @@ export type ResourceStatus = 'Available' | 'Low' | 'Critical';
 export type UrgencyLevel = 'Critical' | 'High' | 'Moderate';
 export type RequestStatus = 'Active' | 'Fulfilled' | 'Expired';
 
+export type Hospital = {
+  name: string;
+  address: string;
+  coordinates: [number, number];
+  rating: number;
+};
+
 export type Resource = {
   id: string;
   bloodType: BloodType;
   quantity: number;
   location: string;
   status: ResourceStatus;
+  hospital: Hospital;
 };
 
 export type UrgentRequest = {
