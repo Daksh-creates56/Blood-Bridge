@@ -72,10 +72,21 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
       L.control.layers(baseMaps).addTo(mapInstance.current);
     }
     
+    // Invalidate size on container changes
+    const map = mapInstance.current;
+    const resizeObserver = new ResizeObserver(() => {
+      map?.invalidateSize();
+    });
+    if (mapRef.current) {
+      resizeObserver.observe(mapRef.current);
+    }
+    
     return () => {
-      // Clean up map instance on component unmount
-      if (mapInstance.current) {
-        mapInstance.current.remove();
+      if (mapRef.current) {
+        resizeObserver.unobserve(mapRef.current);
+      }
+      if (map) {
+        map.remove();
         mapInstance.current = null;
       }
     }
@@ -84,6 +95,14 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
   // Add/update camp markers
   useEffect(() => {
     if (mapInstance.current) {
+      // Remove markers for camps that no longer exist
+      Object.keys(markersRef.current).forEach(campId => {
+        if (!camps.find(c => c.id === campId)) {
+          markersRef.current[campId].remove();
+          delete markersRef.current[campId];
+        }
+      });
+      
       camps.forEach(camp => {
         if (!markersRef.current[camp.id]) {
           const marker = L.marker(camp.coordinates)
@@ -123,21 +142,16 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
         const selectedMarker = markersRef.current[selectedCamp.id];
         if (selectedMarker) {
           selectedMarker.setIcon(selectedIcon);
+          if (!userLocation) { // Only fly to camp if user location is not set
+            mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
+                animate: true,
+                duration: 1.5
+            });
+          }
         }
       }
     }
-  }, [selectedCamp]);
-
-  // Pan to selected camp
-  useEffect(() => {
-    if (mapInstance.current && selectedCamp) {
-        mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
-            animate: true,
-            duration: 1.5
-        });
-    }
-  }, [selectedCamp])
-
+  }, [selectedCamp, userLocation]);
 
   return <div ref={mapRef} className="h-full w-full" />;
 }

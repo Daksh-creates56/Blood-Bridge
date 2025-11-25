@@ -118,6 +118,9 @@ export default function DonationCampsPage() {
         });
 
         setNearestCamp(closestCamp);
+        if (closestCamp) {
+          setSelectedCamp(closestCamp);
+        }
         setIsLocating(false);
       },
       (error) => {
@@ -149,10 +152,10 @@ export default function DonationCampsPage() {
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-theme(spacing.24))]">
+      <div className="flex h-[calc(100vh-theme(spacing.24))] flex-col">
         
         {/* Section 1: Map */}
-        <div className="flex-shrink-0 w-full h-[40vh] rounded-lg overflow-hidden border">
+        <div className="h-[40vh] w-full flex-shrink-0 rounded-lg border">
           <CampMapView 
               camps={sortedCamps}
               selectedCamp={selectedCamp}
