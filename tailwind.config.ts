@@ -18,7 +18,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['var(--font-inter)', 'sans-serif'],
-        headline: ['var(--font-poppins)', 'sans-serif'],
+        headline: ['var(--font-bebas-neue)', 'sans-serif'],
       },
       colors: {
         border: 'hsl(var(--border))',
