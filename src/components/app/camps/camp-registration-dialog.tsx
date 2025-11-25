@@ -28,13 +28,12 @@ const FileInput = () => {
 
     return (
         <div className="relative">
-            <FileUp className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
                 type="file"
                 id={name}
                 name={name}
                 accept="application/pdf"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 onBlur={onBlur}
                 onChange={(e) => {
                     const file = e.target.files?.[0];
@@ -43,7 +42,9 @@ const FileInput = () => {
                     } else {
                         setFileName('');
                     }
-                    onChange(e.target.files);
+                    if (onChange) {
+                      onChange(e.target.files);
+                    }
                 }}
             />
             <Label 
@@ -54,7 +55,8 @@ const FileInput = () => {
                     "cursor-pointer"
                 )}
             >
-                <span className="pl-6 truncate text-muted-foreground">
+                <FileUp className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="truncate text-muted-foreground">
                     {fileName || 'Select a PDF file...'}
                 </span>
             </Label>
@@ -75,6 +77,11 @@ export function CampRegistrationDialog({ camp, isOpen, onOpenChange }: { camp: D
   const step1Form = useForm<z.infer<typeof campRegistrationStep1Schema>>({
     resolver: zodResolver(campRegistrationStep1Schema),
     mode: 'onBlur',
+    defaultValues: {
+      fullName: '',
+      age: undefined,
+      idProof: undefined
+    }
   });
 
   const getCameraPermission = useCallback(async () => {
@@ -252,3 +259,5 @@ export function CampRegistrationDialog({ camp, isOpen, onOpenChange }: { camp: D
     </Dialog>
   );
 }
+
+    
