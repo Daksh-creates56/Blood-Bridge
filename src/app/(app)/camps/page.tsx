@@ -144,16 +144,16 @@ export default function DonationCampsPage() {
   }, [sortedCamps]);
   
   useEffect(() => {
-    if(sortedCamps.length > 0 && !selectedCamp) {
+    if(sortedCamps.length > 0 && !selectedCamp && !nearestCamp) {
       setSelectedCamp(sortedCamps[0]);
     }
-  }, [sortedCamps, selectedCamp]);
+  }, [sortedCamps, selectedCamp, nearestCamp]);
 
 
   return (
     <>
-      <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-theme(spacing.24))]">
-          <div className="w-full md:w-1/3 flex flex-col gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-theme(spacing.24))]">
+          <div className="md:col-span-1 flex flex-col gap-4 h-full">
               <div className="flex-shrink-0 flex flex-col gap-4">
                    <Button onClick={findNearestCamp} disabled={isLocating} className="w-full">
                     {isLocating ? (
@@ -201,7 +201,7 @@ export default function DonationCampsPage() {
                   )}
               </ScrollArea>
           </div>
-          <div className="w-full md:w-2/3 h-full rounded-lg overflow-hidden border">
+          <div className="md:col-span-2 h-[400px] md:h-full rounded-lg overflow-hidden border">
               <CampMapView 
                   camps={sortedCamps}
                   selectedCamp={selectedCamp}
