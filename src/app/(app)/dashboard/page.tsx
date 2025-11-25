@@ -45,87 +45,81 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="lg:col-span-2">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Units</CardTitle>
-                    <Package className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{resources.length}</div>
-                    <p className="text-xs text-muted-foreground">Blood units across all locations</p>
-                </CardContent>
-                </Card>
-                <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Critical</CardTitle>
-                    <AlertTriangle className="h-4 w-4 text-destructive" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold text-destructive">{criticalCount}</div>
-                    <p className="text-xs text-muted-foreground">Units with critical stock</p>
-                </CardContent>
-                </Card>
-                <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Low</CardTitle>
-                    <ShieldAlert className="h-4 w-4 text-orange-500" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold text-orange-500">{lowCount}</div>
-                    <p className="text-xs text-muted-foreground">Units with low stock</p>
-                </CardContent>
-                </Card>
-                <Card className="lg:col-span-4">
-                    <CardContent className="p-4 flex flex-col gap-4 md:flex-row md:items-center">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                            placeholder="Filter by blood type or location..."
-                            className="pl-9"
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                            <Select value={statusFilter} onValueChange={(value: ResourceStatus | 'All') => setStatusFilter(value)}>
-                            <SelectTrigger className="w-full md:w-[180px]">
-                                <SelectValue placeholder="Filter by status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="All">All Statuses</SelectItem>
-                                <SelectItem value="Available">Sufficient</SelectItem>
-                                <SelectItem value="Low">Low</SelectItem>
-                                <SelectItem value="Critical">Critical</SelectItem>
-                            </SelectContent>
-                            </Select>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-             {filteredResources.length > 0 ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 mt-6">
-                {filteredResources.map(resource => (
-                    <ResourceCard key={resource.id} resource={resource} onUpdate={handleUpdateResource} />
-                ))}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Units</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{resources.length}</div>
+            <p className="text-xs text-muted-foreground">Blood units across all locations</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Critical</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-destructive">{criticalCount}</div>
+            <p className="text-xs text-muted-foreground">Units with critical stock</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Low</CardTitle>
+            <ShieldAlert className="h-4 w-4 text-orange-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-500">{lowCount}</div>
+            <p className="text-xs text-muted-foreground">Units with low stock</p>
+          </CardContent>
+        </Card>
+        <Card className="lg:col-span-4">
+            <CardContent className="p-4 flex flex-col gap-4 md:flex-row md:items-center">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                    placeholder="Filter by blood type or location..."
+                    className="pl-9"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    />
                 </div>
-            ) : (
-                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-24 text-center mt-6">
-                    <h3 className="text-2xl font-semibold tracking-tight">No resources found</h3>
-                    <p className="mt-2 text-muted-foreground">Try adjusting your search or filters.</p>
-                    <Button variant="outline" className="mt-4" onClick={() => { setSearchTerm(''); setStatusFilter('All');}}>
-                    Clear Filters
-                    </Button>
+                <div className="flex items-center gap-2">
+                    <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                    <Select value={statusFilter} onValueChange={(value: ResourceStatus | 'All') => setStatusFilter(value)}>
+                    <SelectTrigger className="w-full md:w-[180px]">
+                        <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="All">All Statuses</SelectItem>
+                        <SelectItem value="Available">Sufficient</SelectItem>
+                        <SelectItem value="Low">Low</SelectItem>
+                        <SelectItem value="Critical">Critical</SelectItem>
+                    </SelectContent>
+                    </Select>
                 </div>
-            )}
-        </div>
-        <div className="lg:col-span-1">
-            <BloodCompatibilityMatrix />
-        </div>
+            </CardContent>
+        </Card>
       </div>
+      {filteredResources.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredResources.map(resource => (
+            <ResourceCard key={resource.id} resource={resource} onUpdate={handleUpdateResource} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-24 text-center">
+            <h3 className="text-2xl font-semibold tracking-tight">No resources found</h3>
+            <p className="mt-2 text-muted-foreground">Try adjusting your search or filters.</p>
+            <Button variant="outline" className="mt-4" onClick={() => { setSearchTerm(''); setStatusFilter('All');}}>
+            Clear Filters
+            </Button>
+        </div>
+      )}
+       <BloodCompatibilityMatrix />
     </div>
   );
 }
