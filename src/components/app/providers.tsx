@@ -25,3 +25,9 @@ export function Providers({ children, ...props }: ThemeProviderProps) {
       attribute="class"
       defaultTheme="system"
       enableSystem
+      {...props}
+    >
+      {children}
+    </ThemeProvider>
+  );
+}

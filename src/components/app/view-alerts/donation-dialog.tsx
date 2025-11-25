@@ -1,70 +1,114 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import { Droplets, Hospital, Clock, MapPin, RadioTower } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, HandHeart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 import type { UrgentRequest } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { DonationDialog } from './donation-dialog';
 
-interface RequestCardProps {
+interface DonationDialogProps {
   request: UrgentRequest;
   onFulfill: (requestId: string, donorLocation: string) => void;
 }
 
-export function RequestCard({ request, onFulfill }: RequestCardProps) {
-  const [timeAgo, setTimeAgo] = useState('');
+const donationSchema = z.object({
+  donorLocation: z.string().min(1, { message: "Your location or blood bank name is required." }),
+});
 
-  useEffect(() => {
-    setTimeAgo(formatDistanceToNow(new Date(request.createdAt), { addSuffix: true }));
-    const interval = setInterval(() => {
-      setTimeAgo(formatDistanceToNow(new Date(request.createdAt), { addSuffix: true }));
-    }, 60000); // Update every minute
-    return () => clearInterval(interval);
-  }, [request.createdAt]);
+export function DonationDialog({ request, onFulfill }: DonationDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const urgencyColor = {
-    Critical: 'border-red-500 bg-red-50 dark:bg-red-900/20',
-    High: 'border-orange-500 bg-orange-50 dark:bg-orange-900/20',
-    Moderate: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20',
-  }[request.urgency];
+  const form = useForm<z.infer<typeof donationSchema>>({
+    resolver: zodResolver(donationSchema),
+    defaultValues: {
+      donorLocation: '',
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof donationSchema>) => {
+    setIsLoading(true);
+    
+    // Simulate a network request
+    setTimeout(() => {
+      onFulfill(request.id, values.donorLocation);
+      toast({
+        title: 'Thank You!',
+        description: `Your pledge to donate has been recorded. Please proceed to ${request.hospitalName}.`,
+      });
+      setIsLoading(false);
+      setOpen(false);
+      form.reset();
+    }, 1500);
+  };
 
   return (
-    <Card className={cn('flex flex-col', urgencyColor)}>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-3xl font-bold">{request.bloodType}</CardTitle>
-            <CardDescription className="text-base">{request.urgency} Urgency</CardDescription>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl font-bold">{request.quantity}</div>
-            <div className="text-sm text-muted-foreground">units</div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-1 space-y-3">
-        <div className="flex items-center gap-3">
-          <Hospital className="h-5 w-5 text-muted-foreground" />
-          <span>{request.hospitalName}</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <MapPin className="h-5 w-5 text-muted-foreground" />
-          <span>{request.location}</span>
-        </div>
-         <div className="flex items-center gap-3">
-          <RadioTower className="h-5 w-5 text-muted-foreground" />
-          <span>{request.broadcastRadius} broadcast radius</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Clock className="h-5 w-5 text-muted-foreground" />
-          <span>{timeAgo}</span>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <DonationDialog request={request} onFulfill={onFulfill} />
-      </CardFooter>
-    </Card>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="w-full">
+          <HandHeart className="mr-2 h-4 w-4" />
+          Pledge to Donate
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Pledge for {request.bloodType} Donation</DialogTitle>
+          <DialogDescription>
+            You are about to fulfill the request for {request.quantity} units of {request.bloodType} blood for {request.hospitalName}.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="donorLocation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Your Location / Blood Bank Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Downtown Blood Bank or your area" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Confirm Donation Pledge'
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

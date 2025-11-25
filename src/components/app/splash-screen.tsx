@@ -18,3 +18,6 @@ export function SplashScreen() {
           Bridging the gap between need & donor.
         </p>
       </div>
+    </div>
+  );
+}
