@@ -1,6 +1,6 @@
 'use client';
 
-import { Droplets, MapPin } from 'lucide-react';
+import { Droplets, MapPin, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Resource } from '@/lib/types';
 import {
@@ -14,7 +14,6 @@ import { Badge } from '@/components/ui/badge';
 import { UpdateUnitsDialog } from './update-units-dialog';
 import { LocationDialog } from './location-dialog';
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 
 interface ResourceCardProps {
   resource: Resource;
@@ -53,8 +52,9 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
             {resource.hospital ? (
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="text-sm text-left text-wrap hover:underline focus:outline-none focus:ring-2 focus:ring-ring rounded-sm">
-                    {resource.hospital.name}
+                   <button className="inline-flex items-center gap-1.5 text-sm text-left text-wrap hover:underline focus:outline-none focus:ring-2 focus:ring-ring rounded-sm text-blue-500 hover:text-blue-400">
+                    <span>{resource.hospital.name}</span>
+                    <ExternalLink className="h-4 w-4" />
                   </button>
                 </DialogTrigger>
                 <DialogContent className="max-w-3xl">
