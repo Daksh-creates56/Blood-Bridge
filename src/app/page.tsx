@@ -7,6 +7,7 @@ import { HeartPulse, Droplets, ShieldCheck, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
+  SheetTrigger,
   SheetContent,
   SheetHeader,
   SheetTitle,
