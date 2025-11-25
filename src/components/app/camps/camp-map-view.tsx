@@ -9,31 +9,40 @@ import 'leaflet-defaulticon-compatibility';
 import type { DonationCamp } from '@/lib/types';
 
 interface MapViewProps {
-  camp: DonationCamp;
+  camps: DonationCamp[];
+  selectedCamp: DonationCamp | null;
   userLocation?: [number, number] | null;
 }
 
-// Custom icon for user location
 const userIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-  className: 'leaflet-marker-user'
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
 });
 
-export default function CampMapView({ camp, userLocation }: MapViewProps) {
+const selectedIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+
+export default function CampMapView({ camps, selectedCamp, userLocation }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
+  const markersRef = useRef<Record<string, L.Marker>>({});
 
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
         
-      const initialCenter = userLocation || camp.coordinates;
-      const initialZoom = userLocation ? 13 : 16;
+      const initialCenter: [number, number] = selectedCamp ? selectedCamp.coordinates : [19.0760, 72.8777]; // Default to Mumbai
+      const initialZoom = 12;
       mapInstance.current = L.map(mapRef.current).setView(initialCenter, initialZoom);
 
       const streetLayer = L.tileLayer(
@@ -59,25 +68,13 @@ export default function CampMapView({ camp, userLocation }: MapViewProps) {
 
       L.control.layers(baseMaps).addTo(mapInstance.current);
 
-      // Add camp marker
-      L.marker(camp.coordinates)
-        .addTo(mapInstance.current)
-        .bindPopup(`<b>${camp.name}</b><br/>${camp.location}`)
-        .openPopup();
-        
-      // Add user location marker if available
-      if (userLocation) {
-        L.marker(userLocation).addTo(mapInstance.current)
-          .bindPopup('<b>Your Location</b>');
-
-        // Create a dotted line between user and camp
-        const latlngs = [userLocation, camp.coordinates];
-        L.polyline(latlngs, {color: 'hsl(var(--primary))', dashArray: '5, 10'}).addTo(mapInstance.current);
-
-        // Adjust map bounds to show both markers
-        mapInstance.current.fitBounds(L.latLngBounds(userLocation, camp.coordinates), { padding: [50, 50] });
-      }
-
+      // Add camp markers
+      camps.forEach(camp => {
+          const marker = L.marker(camp.coordinates)
+            .addTo(mapInstance.current!)
+            .bindPopup(`<b>${camp.name}</b><br/>${camp.location}`);
+          markersRef.current[camp.id] = marker;
+      });
     }
 
     return () => {
@@ -86,7 +83,45 @@ export default function CampMapView({ camp, userLocation }: MapViewProps) {
         mapInstance.current = null;
       }
     };
-  }, [camp, userLocation]);
+  }, []); // Only run once on mount
+
+  // Handle user location
+  useEffect(() => {
+      if(mapInstance.current && userLocation) {
+          const userMarker = L.marker(userLocation, { icon: userIcon })
+            .addTo(mapInstance.current)
+            .bindPopup('<b>Your Location</b>');
+
+          // Add a cleanup function to remove the marker when component unmounts or userLocation changes
+          return () => {
+              userMarker.remove();
+          }
+      }
+  }, [userLocation]);
+
+
+  // Handle camp selection
+  useEffect(() => {
+    if (mapInstance.current && selectedCamp) {
+      
+      // Reset all icons to default
+      Object.values(markersRef.current).forEach(marker => marker.setIcon(new L.Icon.Default()));
+
+      // Set selected icon
+      const selectedMarker = markersRef.current[selectedCamp.id];
+      if (selectedMarker) {
+        selectedMarker.setIcon(selectedIcon);
+        selectedMarker.openPopup();
+      }
+      
+      // Pan to selected camp
+      mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
+          animate: true,
+          duration: 1.5
+      });
+    }
+  }, [selectedCamp]);
+
 
   return <div ref={mapRef} className="h-full w-full" />;
 }

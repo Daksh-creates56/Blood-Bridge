@@ -3,50 +3,34 @@
 import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { format } from 'date-fns';
-import { Map, Calendar, Clock, MapPin, Building, LocateFixed, Loader2, XCircle } from 'lucide-react';
+import { Map, Calendar, Clock, Building, LocateFixed, Loader2, XCircle } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialDonationCamps } from '@/lib/data';
 import type { DonationCamp } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getDistance } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-
-interface CampDialogProps {
-  camp: DonationCamp;
-  isOpen: boolean;
-  userLocation: [number, number] | null;
-}
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const CampMapView = dynamic(() => import('@/components/app/camps/camp-map-view'), {
   ssr: false,
-  loading: () => <Skeleton className="h-[400px] w-full" />,
+  loading: () => <Skeleton className="h-full w-full" />,
 });
 
-function CampLocationDialog({ camp, isOpen, userLocation }: CampDialogProps) {
-  return (
-    <>
-      <DialogHeader>
-        <DialogTitle>{camp.name}</DialogTitle>
-      </DialogHeader>
-      <div className="space-y-4">
-        <p className="text-muted-foreground">{camp.address}</p>
-        <div className="h-[400px] w-full overflow-hidden rounded-md border">
-          {isOpen && <CampMapView key={camp.id} camp={camp} userLocation={userLocation} />}
-        </div>
-      </div>
-    </>
-  );
-}
-
-
-function CampCard({ camp, onSelectCamp, isNearest }: { camp: DonationCamp; onSelectCamp: (camp: DonationCamp) => void; isNearest: boolean; }) {
+function CampCard({ camp, onSelectCamp, isNearest, isSelected }: { camp: DonationCamp; onSelectCamp: (camp: DonationCamp) => void; isNearest: boolean; isSelected: boolean }) {
   const campDate = new Date(camp.date);
 
   return (
-    <Card className={cn("flex flex-col", isNearest && "border-primary border-2 shadow-lg")}>
+    <Card 
+      onClick={() => onSelectCamp(camp)} 
+      className={cn(
+        "flex flex-col cursor-pointer transition-all duration-200", 
+        isNearest && "border-primary border-2",
+        isSelected ? "shadow-xl scale-105 border-primary" : "hover:shadow-lg"
+      )}
+    >
       <CardHeader>
         {isNearest && <div className="text-sm font-semibold text-primary mb-2">Nearest Camp</div>}
         <CardTitle>{camp.name}</CardTitle>
@@ -66,12 +50,6 @@ function CampCard({ camp, onSelectCamp, isNearest }: { camp: DonationCamp; onSel
           <span>{camp.location}</span>
         </div>
       </CardContent>
-      <CardFooter>
-        <Button variant="outline" className="w-full" onClick={() => onSelectCamp(camp)}>
-          <MapPin className="mr-2 h-4 w-4" />
-          View on Map
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
@@ -122,6 +100,9 @@ export default function DonationCampsPage() {
         });
 
         setNearestCamp(closestCamp);
+        if (closestCamp) {
+          setSelectedCamp(closestCamp);
+        }
         setIsLocating(false);
       },
       (error) => {
@@ -143,61 +124,67 @@ export default function DonationCampsPage() {
       }
     );
   };
+  
+  // Set the first camp as selected by default if none is selected
+  useMemo(() => {
+    if(!selectedCamp && sortedCamps.length > 0) {
+      setSelectedCamp(sortedCamps[0]);
+    }
+  }, [sortedCamps, selectedCamp]);
+
 
   return (
-    <>
-      <div className="space-y-8">
-        <div className="text-center">
-          <Map className="mx-auto h-12 w-12 text-primary" />
-          <h1 className="mt-4 text-3xl font-bold tracking-tight">Upcoming Donation Camps</h1>
-          <p className="mt-2 text-muted-foreground">Find a camp near you and save a life.</p>
-        </div>
+    <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-theme(spacing.24))]">
+        <div className="w-full md:w-1/3 flex flex-col gap-4">
+            <div className="flex-shrink-0 flex flex-col items-center justify-center gap-4">
+                 <Button onClick={findNearestCamp} disabled={isLocating} className="w-full">
+                  {isLocating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Locating...
+                    </>
+                  ) : (
+                    <>
+                      <LocateFixed className="mr-2 h-4 w-4" />
+                      Find My Location & Nearest Camp
+                    </>
+                  )}
+                </Button>
+                {locationError && (
+                  <p className="text-sm text-destructive flex items-center gap-2">
+                    <XCircle className="h-4 w-4" /> {locationError}
+                  </p>
+                )}
+            </div>
 
-        <div className="flex flex-col items-center justify-center gap-4">
-            <Button onClick={findNearestCamp} disabled={isLocating}>
-              {isLocating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Locating...
-                </>
-              ) : (
-                <>
-                  <LocateFixed className="mr-2 h-4 w-4" />
-                  Find Nearest Camp
-                </>
-              )}
-            </Button>
-            {locationError && (
-              <p className="text-sm text-destructive flex items-center gap-2">
-                <XCircle className="h-4 w-4" /> {locationError}
-              </p>
-            )}
+            <ScrollArea className="flex-grow h-0">
+                {sortedCamps.length > 0 ? (
+                <div className="space-y-4 pr-4">
+                    {sortedCamps.map(camp => (
+                    <CampCard 
+                        key={camp.id} 
+                        camp={camp} 
+                        onSelectCamp={setSelectedCamp} 
+                        isNearest={nearestCamp?.id === camp.id} 
+                        isSelected={selectedCamp?.id === camp.id}
+                    />
+                    ))}
+                </div>
+                ) : (
+                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-20 text-center">
+                    <h3 className="mt-4 text-2xl font-semibold tracking-tight">No Upcoming Camps</h3>
+                    <p className="mt-2 text-muted-foreground">Please check back later.</p>
+                </div>
+                )}
+            </ScrollArea>
         </div>
-        
-        {sortedCamps.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {sortedCamps.map(camp => (
-              <CampCard 
-                key={camp.id} 
-                camp={camp} 
-                onSelectCamp={setSelectedCamp} 
-                isNearest={nearestCamp?.id === camp.id} 
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-20 text-center">
-            <h3 className="mt-4 text-2xl font-semibold tracking-tight">No Upcoming Camps</h3>
-            <p className="mt-2 text-muted-foreground">Please check back later for new donation camp announcements.</p>
-          </div>
-        )}
-      </div>
-
-      <Dialog open={!!selectedCamp} onOpenChange={(isOpen) => !isOpen && setSelectedCamp(null)}>
-        <DialogContent className="max-w-3xl">
-          {selectedCamp && <CampLocationDialog camp={selectedCamp} isOpen={!!selectedCamp} userLocation={userLocation} />}
-        </DialogContent>
-      </Dialog>
-    </>
+        <div className="w-full md:w-2/3 h-full rounded-lg overflow-hidden border">
+            <CampMapView 
+                camps={sortedCamps}
+                selectedCamp={selectedCamp}
+                userLocation={userLocation}
+            />
+        </div>
+    </div>
   );
 }
