@@ -86,7 +86,7 @@ export function RequestCard({ request, onFulfill }: RequestCardProps) {
                 {hospitals.map(hospital => (
                   <SelectItem key={hospital.name} value={hospital.name}>
                     {hospital.name}
-                  </"SelectItem>
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
