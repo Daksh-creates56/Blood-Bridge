@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, HandHeart } from 'lucide-react';
+import { Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -68,13 +68,13 @@ export function DonationDialog({ request, onFulfill }: DonationDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full">
-          <HandHeart className="mr-2 h-4 w-4" />
-          Pledge to Donate
+          <CheckCircle className="mr-2 h-4 w-4" />
+          Fulfill This Request
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Pledge for {request.bloodType} Donation</DialogTitle>
+          <DialogTitle>Fulfill Request for {request.bloodType}</DialogTitle>
           <DialogDescription>
             You are about to fulfill the request for {request.quantity} units of {request.bloodType} blood for {request.hospitalName}.
           </DialogDescription>
@@ -102,7 +102,7 @@ export function DonationDialog({ request, onFulfill }: DonationDialogProps) {
                     Submitting...
                   </>
                 ) : (
-                  'Confirm Donation Pledge'
+                  'Confirm Fulfillment'
                 )}
               </Button>
             </DialogFooter>
