@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { format } from 'date-fns';
 import { Map, Calendar, Clock, Building, LocateFixed, Loader2, XCircle } from 'lucide-react';
@@ -61,10 +61,16 @@ export default function DonationCampsPage() {
   const [nearestCamp, setNearestCamp] = useState<DonationCamp | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [panToLocation, setPanToLocation] = useState<[number, number] | null>(null);
 
   const sortedCamps = useMemo(() => {
     return [...camps].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [camps]);
+
+  const handleSelectCamp = useCallback((camp: DonationCamp) => {
+    setSelectedCamp(camp);
+    setPanToLocation(camp.coordinates);
+  }, []);
 
   const findNearestCamp = () => {
     setIsLocating(true);
@@ -82,28 +88,31 @@ export default function DonationCampsPage() {
         const { latitude, longitude } = position.coords;
         const currentUserLocation: [number, number] = [latitude, longitude];
         setUserLocation(currentUserLocation);
+        setPanToLocation(currentUserLocation);
 
-        let closestCamp: DonationCamp | null = null;
-        let minDistance = Infinity;
+        setTimeout(() => {
+          let closestCamp: DonationCamp | null = null;
+          let minDistance = Infinity;
 
-        sortedCamps.forEach(camp => {
-          const distance = getDistance(
-            currentUserLocation[0],
-            currentUserLocation[1],
-            camp.coordinates[0],
-            camp.coordinates[1]
-          );
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestCamp = camp;
+          sortedCamps.forEach(camp => {
+            const distance = getDistance(
+              currentUserLocation[0],
+              currentUserLocation[1],
+              camp.coordinates[0],
+              camp.coordinates[1]
+            );
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestCamp = camp;
+            }
+          });
+
+          setNearestCamp(closestCamp);
+          if (closestCamp) {
+            handleSelectCamp(closestCamp);
           }
-        });
-
-        setNearestCamp(closestCamp);
-        if (closestCamp) {
-          setSelectedCamp(closestCamp);
-        }
-        setIsLocating(false);
+          setIsLocating(false);
+        }, 1600); // Delay before finding and panning to the nearest camp
       },
       (error) => {
         switch(error.code) {
@@ -125,8 +134,7 @@ export default function DonationCampsPage() {
     );
   };
   
-  // Set the first camp as selected by default if none is selected
-  useMemo(() => {
+  useEffect(() => {
     if(!selectedCamp && sortedCamps.length > 0) {
       setSelectedCamp(sortedCamps[0]);
     }
@@ -164,7 +172,7 @@ export default function DonationCampsPage() {
                     <CampCard 
                         key={camp.id} 
                         camp={camp} 
-                        onSelectCamp={setSelectedCamp} 
+                        onSelectCamp={handleSelectCamp} 
                         isNearest={nearestCamp?.id === camp.id} 
                         isSelected={selectedCamp?.id === camp.id}
                     />
@@ -183,6 +191,7 @@ export default function DonationCampsPage() {
                 camps={sortedCamps}
                 selectedCamp={selectedCamp}
                 userLocation={userLocation}
+                panToLocation={panToLocation}
             />
         </div>
     </div>

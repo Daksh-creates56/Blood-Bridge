@@ -12,6 +12,7 @@ interface MapViewProps {
   camps: DonationCamp[];
   selectedCamp: DonationCamp | null;
   userLocation?: [number, number] | null;
+  panToLocation?: [number, number] | null;
 }
 
 const userIcon = new L.Icon({
@@ -33,15 +34,16 @@ const selectedIcon = new L.Icon({
 });
 
 
-export default function CampMapView({ camps, selectedCamp, userLocation }: MapViewProps) {
+export default function CampMapView({ camps, selectedCamp, userLocation, panToLocation }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const markersRef = useRef<Record<string, L.Marker>>({});
+  const userMarkerRef = useRef<L.Marker | null>(null);
 
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
         
-      const initialCenter: [number, number] = selectedCamp ? selectedCamp.coordinates : [19.0760, 72.8777]; // Default to Mumbai
+      const initialCenter: [number, number] = camps.length > 0 ? camps[0].coordinates : [19.0760, 72.8777]; // Default to Mumbai
       const initialZoom = 12;
       mapInstance.current = L.map(mapRef.current).setView(initialCenter, initialZoom);
 
@@ -77,50 +79,49 @@ export default function CampMapView({ camps, selectedCamp, userLocation }: MapVi
       });
     }
 
-    return () => {
-      if (mapInstance.current) {
-        mapInstance.current.remove();
-        mapInstance.current = null;
-      }
-    };
-  }, []); // Only run once on mount
+  }, [camps]); 
 
-  // Handle user location
+  // Handle user location marker
   useEffect(() => {
       if(mapInstance.current && userLocation) {
-          const userMarker = L.marker(userLocation, { icon: userIcon })
-            .addTo(mapInstance.current)
-            .bindPopup('<b>Your Location</b>');
-
-          // Add a cleanup function to remove the marker when component unmounts or userLocation changes
-          return () => {
-              userMarker.remove();
+          if (userMarkerRef.current) {
+              userMarkerRef.current.setLatLng(userLocation);
+          } else {
+              userMarkerRef.current = L.marker(userLocation, { icon: userIcon })
+                .addTo(mapInstance.current)
+                .bindPopup('<b>Your Location</b>');
           }
       }
   }, [userLocation]);
 
 
-  // Handle camp selection
+  // Handle camp selection highlighting
   useEffect(() => {
-    if (mapInstance.current && selectedCamp) {
+    if (mapInstance.current) {
       
       // Reset all icons to default
       Object.values(markersRef.current).forEach(marker => marker.setIcon(new L.Icon.Default()));
 
       // Set selected icon
-      const selectedMarker = markersRef.current[selectedCamp.id];
-      if (selectedMarker) {
-        selectedMarker.setIcon(selectedIcon);
-        selectedMarker.openPopup();
+      if (selectedCamp) {
+        const selectedMarker = markersRef.current[selectedCamp.id];
+        if (selectedMarker) {
+          selectedMarker.setIcon(selectedIcon);
+          selectedMarker.openPopup();
+        }
       }
-      
-      // Pan to selected camp
-      mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
-          animate: true,
-          duration: 1.5
-      });
     }
   }, [selectedCamp]);
+
+  // Handle panning the map
+  useEffect(() => {
+    if (mapInstance.current && panToLocation) {
+        mapInstance.current.flyTo(panToLocation, 15, {
+            animate: true,
+            duration: 1.5
+        });
+    }
+  }, [panToLocation])
 
 
   return <div ref={mapRef} className="h-full w-full" />;
