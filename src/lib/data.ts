@@ -20,6 +20,9 @@ export const hospitals: Hospital[] = [
 
 
 const bloodTypes: BloodType[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+const urgencyLevels: ('Critical' | 'High' | 'Moderate')[] = ['Critical', 'High', 'Moderate'];
+const broadcastRadii: ('5km' | '10km')[] = ['5km', '10km'];
+const requestStatuses: ('Fulfilled' | 'Expired')[] = ['Fulfilled', 'Expired'];
 
 // Generate mock resources
 export const initialResources: Resource[] = bloodTypes.flatMap((type, i) => 
@@ -88,6 +91,29 @@ export const initialUrgentRequests: UrgentRequest[] = [
     status: 'Expired',
   },
 ];
+
+
+// Generate 100 additional mock requests for history
+for (let i = 5; i < 105; i++) {
+  const status = requestStatuses[Math.floor(Math.random() * requestStatuses.length)];
+  const requestingHospital = hospitals[Math.floor(Math.random() * hospitals.length)];
+  const fulfillingHospital = hospitals[Math.floor(Math.random() * hospitals.length)];
+
+  const request: UrgentRequest = {
+    id: `req-${i}`,
+    bloodType: bloodTypes[Math.floor(Math.random() * bloodTypes.length)],
+    quantity: Math.floor(Math.random() * 15) + 1,
+    urgency: urgencyLevels[Math.floor(Math.random() * urgencyLevels.length)],
+    hospitalName: requestingHospital.name,
+    location: requestingHospital.address,
+    broadcastRadius: broadcastRadii[Math.floor(Math.random() * broadcastRadii.length)],
+    createdAt: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString(),
+    status: status,
+    fulfilledBy: status === 'Fulfilled' ? fulfillingHospital.name : undefined,
+  };
+  initialUrgentRequests.push(request);
+}
+
 
 // Generate mock donation camps
 export const initialDonationCamps: DonationCamp[] = [
