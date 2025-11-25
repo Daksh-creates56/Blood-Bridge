@@ -169,3 +169,10 @@ export default function SendRequestPage() {
                 <Send className="mr-2 h-4 w-4" />
                 Broadcast Request
               </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
