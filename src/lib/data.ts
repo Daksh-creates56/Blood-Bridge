@@ -93,8 +93,8 @@ export const initialUrgentRequests: UrgentRequest[] = [
 ];
 
 
-// Generate 100 additional mock requests for history
-for (let i = 5; i < 105; i++) {
+// Generate 200 additional mock requests for history
+for (let i = 5; i < 205; i++) {
   const status = requestStatuses[Math.floor(Math.random() * requestStatuses.length)];
   const requestingHospital = hospitals[Math.floor(Math.random() * hospitals.length)];
   const fulfillingHospital = hospitals[Math.floor(Math.random() * hospitals.length)];
