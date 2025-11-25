@@ -88,31 +88,30 @@ export default function DonationCampsPage() {
         const { latitude, longitude } = position.coords;
         const currentUserLocation: [number, number] = [latitude, longitude];
         setUserLocation(currentUserLocation);
-        setPanToLocation(currentUserLocation);
+        setPanToLocation(currentUserLocation); // 1. Pan to user's location first.
 
-        setTimeout(() => {
-          let closestCamp: DonationCamp | null = null;
-          let minDistance = Infinity;
+        let closestCamp: DonationCamp | null = null;
+        let minDistance = Infinity;
 
-          sortedCamps.forEach(camp => {
-            const distance = getDistance(
-              currentUserLocation[0],
-              currentUserLocation[1],
-              camp.coordinates[0],
-              camp.coordinates[1]
-            );
-            if (distance < minDistance) {
-              minDistance = distance;
-              closestCamp = camp;
-            }
-          });
-
-          setNearestCamp(closestCamp);
-          if (closestCamp) {
-            handleSelectCamp(closestCamp);
+        sortedCamps.forEach(camp => {
+          const distance = getDistance(
+            currentUserLocation[0],
+            currentUserLocation[1],
+            camp.coordinates[0],
+            camp.coordinates[1]
+          );
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestCamp = camp;
           }
-          setIsLocating(false);
-        }, 1600); // Delay before finding and panning to the nearest camp
+        });
+
+        setNearestCamp(closestCamp);
+        if (closestCamp) {
+          // 2. Just select the camp to highlight it, but don't pan automatically.
+          setSelectedCamp(closestCamp);
+        }
+        setIsLocating(false);
       },
       (error) => {
         switch(error.code) {
