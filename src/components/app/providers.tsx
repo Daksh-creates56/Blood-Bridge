@@ -4,6 +4,7 @@ import * as React from 'react';
 import { ThemeProvider } from 'next-themes';
 import { type ThemeProviderProps } from 'next-themes/dist/types';
 import { SplashScreen } from './splash-screen';
+import { ClickEffect } from './click-effect';
 
 export function Providers({ children, ...props }: ThemeProviderProps) {
   const [showSplash, setShowSplash] = React.useState(true);
@@ -27,6 +28,7 @@ export function Providers({ children, ...props }: ThemeProviderProps) {
       enableSystem
       {...props}
     >
+      <ClickEffect />
       {children}
     </ThemeProvider>
   );
