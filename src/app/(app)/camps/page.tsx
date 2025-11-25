@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -88,7 +89,7 @@ export default function DonationCampsPage() {
         const { latitude, longitude } = position.coords;
         const currentUserLocation: [number, number] = [latitude, longitude];
         setUserLocation(currentUserLocation);
-        setPanToLocation(currentUserLocation); // 1. Pan to user's location first.
+        setPanToLocation(currentUserLocation);
 
         let closestCamp: DonationCamp | null = null;
         let minDistance = Infinity;
@@ -108,7 +109,6 @@ export default function DonationCampsPage() {
 
         setNearestCamp(closestCamp);
         if (closestCamp) {
-          // 2. Just select the camp to highlight it, but don't pan automatically.
           setSelectedCamp(closestCamp);
         }
         setIsLocating(false);
@@ -134,10 +134,12 @@ export default function DonationCampsPage() {
   };
   
   useEffect(() => {
-    if(!selectedCamp && sortedCamps.length > 0) {
+    // Only set the first camp as selected if no camp has been selected yet.
+    // This avoids overriding a user-driven selection or the nearest camp selection.
+    if(!selectedCamp && !userLocation && sortedCamps.length > 0) {
       setSelectedCamp(sortedCamps[0]);
     }
-  }, [sortedCamps, selectedCamp]);
+  }, [sortedCamps, selectedCamp, userLocation]);
 
 
   return (
