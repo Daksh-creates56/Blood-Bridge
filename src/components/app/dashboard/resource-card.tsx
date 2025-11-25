@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Droplets, MapPin, ExternalLink } from 'lucide-react';
+import { Droplets, MapPin, ExternalLink, Activity } from 'lucide-react';
 import type { Resource } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { UpdateUnitsDialog } from './update-units-dialog';
 import { LocationDialog } from './location-dialog';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 interface ResourceCardProps {
   resource: Resource;
@@ -17,19 +18,28 @@ interface ResourceCardProps {
 export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
   const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
 
-  const badgeVariant = {
-    Available: 'success',
-    Low: 'warning',
-    Critical: 'destructive',
-  }[resource.status];
+  const statusStyles = {
+    Available: {
+      badge: 'success' as const,
+      gradient: 'from-green-50/50 to-background',
+    },
+    Low: {
+      badge: 'warning' as const,
+      gradient: 'from-orange-50/50 to-background',
+    },
+    Critical: {
+      badge: 'destructive' as const,
+      gradient: 'from-red-50/50 to-background',
+    },
+  };
 
   return (
     <>
-      <Card className="flex flex-col h-full hover:shadow-lg transition-shadow duration-300 bg-card">
+      <Card className={cn("flex flex-col h-full hover:shadow-lg transition-shadow duration-300 bg-gradient-to-br", statusStyles[resource.status].gradient)}>
         <CardHeader>
           <div className="flex items-start justify-between">
             <CardTitle className="text-4xl font-bold text-primary">{resource.bloodType}</CardTitle>
-            <Badge variant={badgeVariant as any} className="text-xs font-semibold">
+            <Badge variant={statusStyles[resource.status].badge} className="text-xs font-semibold">
               {resource.status}
             </Badge>
           </div>
