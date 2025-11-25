@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { format } from 'date-fns';
-import { Map, Calendar, Clock, Building, LocateFixed, Loader2, XCircle, FilePlus, AlertTriangle } from 'lucide-react';
+import { Map, Calendar, Clock, Building, LocateFixed, Loader2, FilePlus, AlertTriangle } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialDonationCamps } from '@/lib/data';
 import type { DonationCamp } from '@/lib/types';
@@ -88,8 +88,7 @@ export default function DonationCampsPage() {
   const findNearestCamp = useCallback(() => {
     setIsLocating(true);
     setLocationError(null);
-    setNearestCamp(null);
-
+    
     if (!navigator.geolocation) {
       setLocationError("Geolocation is not supported by your browser.");
       setIsLocating(false);
@@ -119,17 +118,19 @@ export default function DonationCampsPage() {
         });
 
         setNearestCamp(closestCamp);
-        setSelectedCamp(closestCamp); // Also select to highlight
+        if (closestCamp) {
+          setSelectedCamp(closestCamp);
+        }
         setIsLocating(false);
       },
       (error) => {
-        let message = "An unknown error occurred while fetching your location.";
+        let message = "An unknown error occurred.";
         switch(error.code) {
           case error.PERMISSION_DENIED:
-            message = "You have denied location access. Please enable it in your browser settings to use this feature.";
+            message = "Location access denied. Please enable it in browser settings.";
             break;
           case error.POSITION_UNAVAILABLE:
-            message = "Your location information is currently unavailable.";
+            message = "Location information is unavailable.";
             break;
           case error.TIMEOUT:
             message = "The request to get your location timed out.";
@@ -138,11 +139,7 @@ export default function DonationCampsPage() {
         setLocationError(message);
         setIsLocating(false);
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }, [sortedCamps]);
   
