@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal, PlusCircle } from 'lucide-react';
+import { Search, SlidersHorizontal, Package, AlertTriangle, ShieldAlert, ShieldCheck } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialResources } from '@/lib/data';
 import type { Resource, ResourceStatus } from '@/lib/types';
@@ -47,7 +47,8 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Resources</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Units</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{resources.length}</div>
@@ -56,28 +57,31 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-destructive">Critical Supplies</CardTitle>
+            <CardTitle className="text-sm font-medium">Critical</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{criticalCount}</div>
-             <p className="text-xs text-muted-foreground">Units with critical stock levels</p>
+            <div className="text-2xl font-bold text-destructive">{criticalCount}</div>
+             <p className="text-xs text-muted-foreground">Units with critical stock</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-500">Low Supplies</CardTitle>
+            <CardTitle className="text-sm font-medium">Low</CardTitle>
+             <ShieldAlert className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{lowCount}</div>
-             <p className="text-xs text-muted-foreground">Units with low stock levels</p>
+            <div className="text-2xl font-bold text-orange-500">{lowCount}</div>
+             <p className="text-xs text-muted-foreground">Units with low stock</p>
           </CardContent>
         </Card>
          <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-600">Available</CardTitle>
+            <CardTitle className="text-sm font-medium">Sufficient</CardTitle>
+            <ShieldCheck className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{availableCount}</div>
+            <div className="text-2xl font-bold text-green-600">{availableCount}</div>
             <p className="text-xs text-muted-foreground">Units with sufficient stock</p>
           </CardContent>
         </Card>
@@ -102,7 +106,7 @@ export default function DashboardPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All Statuses</SelectItem>
-                <SelectItem value="Available">Available</SelectItem>
+                <SelectItem value="Available">Sufficient</SelectItem>
                 <SelectItem value="Low">Low</SelectItem>
                 <SelectItem value="Critical">Critical</SelectItem>
               </SelectContent>
