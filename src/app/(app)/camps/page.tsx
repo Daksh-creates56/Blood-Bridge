@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { format } from 'date-fns';
-import { Map, Calendar, Clock, Building, LocateFixed, Loader2, XCircle, FilePlus } from 'lucide-react';
+import { Map, Calendar, Clock, Building, LocateFixed, Loader2, XCircle, FilePlus, AlertTriangle } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialDonationCamps } from '@/lib/data';
 import type { DonationCamp } from '@/lib/types';
@@ -15,6 +15,7 @@ import { getDistance } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CampRegistrationDialog } from '@/components/app/camps/camp-registration-dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const CampMapView = dynamic(() => import('@/components/app/camps/camp-map-view'), {
   ssr: false,
@@ -84,7 +85,7 @@ export default function DonationCampsPage() {
     setRegistrationCamp(camp);
   };
 
-  const findNearestCamp = () => {
+  const findNearestCamp = useCallback(() => {
     setIsLocating(true);
     setLocationError(null);
     setNearestCamp(null);
@@ -118,44 +119,45 @@ export default function DonationCampsPage() {
         });
 
         setNearestCamp(closestCamp);
-        if (closestCamp) {
-          // We set selected camp here to highlight it, the map will handle the view
-          setSelectedCamp(closestCamp);
-        }
+        setSelectedCamp(closestCamp); // Also select to highlight
         setIsLocating(false);
       },
       (error) => {
+        let message = "An unknown error occurred while fetching your location.";
         switch(error.code) {
           case error.PERMISSION_DENIED:
-            setLocationError("You denied the request for Geolocation.");
+            message = "You have denied location access. Please enable it in your browser settings to use this feature.";
             break;
           case error.POSITION_UNAVAILABLE:
-            setLocationError("Location information is unavailable.");
+            message = "Your location information is currently unavailable.";
             break;
           case error.TIMEOUT:
-            setLocationError("The request to get user location timed out.");
-            break;
-          default:
-            setLocationError("An unknown error occurred.");
+            message = "The request to get your location timed out.";
             break;
         }
+        setLocationError(message);
         setIsLocating(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
       }
     );
-  };
+  }, [sortedCamps]);
   
   useEffect(() => {
-    if(sortedCamps.length > 0) {
+    if(sortedCamps.length > 0 && !selectedCamp) {
       setSelectedCamp(sortedCamps[0]);
     }
-  }, [sortedCamps]);
+  }, [sortedCamps, selectedCamp]);
 
 
   return (
     <>
       <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-theme(spacing.24))]">
           <div className="w-full md:w-1/3 flex flex-col gap-4">
-              <div className="flex-shrink-0 flex flex-col items-center justify-center gap-4">
+              <div className="flex-shrink-0 flex flex-col gap-4">
                    <Button onClick={findNearestCamp} disabled={isLocating} className="w-full">
                     {isLocating ? (
                       <>
@@ -170,9 +172,13 @@ export default function DonationCampsPage() {
                     )}
                   </Button>
                   {locationError && (
-                    <p className="text-sm text-destructive flex items-center gap-2">
-                      <XCircle className="h-4 w-4" /> {locationError}
-                    </p>
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Location Error</AlertTitle>
+                      <AlertDescription>
+                        {locationError}
+                      </AlertDescription>
+                    </Alert>
                   )}
               </div>
 
