@@ -13,6 +13,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { UpdateUnitsDialog } from './update-units-dialog';
 import { LocationDialog } from './location-dialog';
+import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface ResourceCardProps {
   resource: Resource;
@@ -53,7 +55,19 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
           </div>
         </div>
         {resource.hospital ? (
-          <LocationDialog hospital={resource.hospital} />
+          <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-auto p-0 justify-start w-full text-left">
+                  <div className="flex items-start gap-3 text-muted-foreground">
+                    <MapPin className="mt-1 h-5 w-5 shrink-0" />
+                    <span className="text-sm text-wrap hover:underline">{resource.hospital.name}</span>
+                  </div>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <LocationDialog hospital={resource.hospital} />
+            </DialogContent>
+          </Dialog>
         ) : (
             <div className="flex items-start gap-3 text-muted-foreground">
               <MapPin className="mt-1 h-5 w-5 shrink-0" />
