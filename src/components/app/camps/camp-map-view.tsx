@@ -72,16 +72,17 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
     
     // Invalidate size on container changes
     const map = mapInstance.current;
+    const mapContainer = mapRef.current;
     const resizeObserver = new ResizeObserver(() => {
       map?.invalidateSize();
     });
-    if (mapRef.current) {
-      resizeObserver.observe(mapRef.current);
+    if (mapContainer) {
+      resizeObserver.observe(mapContainer);
     }
     
     return () => {
-      if (mapRef.current) {
-        resizeObserver.unobserve(mapRef.current);
+      if (mapContainer) {
+        resizeObserver.unobserve(mapContainer);
       }
       // Don't destroy map on unmount, just clean up observer
     }
