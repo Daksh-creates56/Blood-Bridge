@@ -1,16 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { HeartPulse, Droplets, ShieldCheck, Zap } from 'lucide-react';
+import { HeartPulse, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
+import { MissionDialog } from '@/components/app/home/mission-dialog';
 
 export default function Home() {
   return (
@@ -48,53 +42,16 @@ export default function Home() {
               Launch Dashboard
             </Link>
           </Button>
-          <Sheet>
-            <SheetTrigger asChild>
+          <Dialog>
+            <DialogTrigger asChild>
               <Button variant="outline" size="lg" className="text-lg font-semibold bg-background/50 backdrop-blur-sm hover:bg-background/80 transition-all duration-300">
                 Our Mission
               </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="mx-auto max-w-5xl rounded-t-2xl border-t-2 border-primary/50 bg-background/90 backdrop-blur-xl p-8 md:p-12">
-              <SheetHeader className="text-center mb-8">
-                <SheetTitle className="text-4xl font-headline font-bold tracking-tight text-primary">Our Mission</SheetTitle>
-                <SheetDescription className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                  To create a seamless and efficient ecosystem that connects blood donors, hospitals, and those in need, leveraging technology to save lives.
-                </SheetDescription>
-              </SheetHeader>
-              <div className="grid grid-cols-1 gap-10 text-center md:grid-cols-3">
-                <div className="flex flex-col items-center p-6 rounded-xl transition-all hover:bg-muted/50 hover:scale-105">
-                  <div className="p-4 bg-red-100/80 dark:bg-red-900/30 rounded-full mb-4">
-                    <Droplets className="h-12 w-12 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-headline font-semibold mb-2">Save Lives</h3>
-                  <p className="max-w-xs text-muted-foreground">
-                    Our platform directly connects those in need with willing
-                    donors, minimizing wait times and saving precious lives.
-                  </p>
-                </div>
-                <div className="flex flex-col items-center p-6 rounded-xl transition-all hover:bg-muted/50 hover:scale-105">
-                   <div className="p-4 bg-red-100/80 dark:bg-red-900/30 rounded-full mb-4">
-                    <HeartPulse className="h-12 w-12 text-primary" />
-                   </div>
-                  <h3 className="text-2xl font-headline font-semibold mb-2">Build Community</h3>
-                  <p className="max-w-xs text-muted-foreground">
-                    We foster a strong community of donors and hospitals,
-                    all working together to ensure a reliable blood supply.
-                  </p>
-                </div>
-                <div className="flex flex-col items-center p-6 rounded-xl transition-all hover:bg-muted/50 hover:scale-105">
-                  <div className="p-4 bg-red-100/80 dark:bg-red-900/30 rounded-full mb-4">
-                    <ShieldCheck className="h-12 w-12 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-headline font-semibold mb-2">Ensure Safety</h3>
-                  <p className="max-w-xs text-muted-foreground">
-                    With AI-powered predictions and real-time tracking, we
-                    proactively manage inventory to prevent shortages.
-                  </p>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl h-[90vh] md:h-auto md:max-h-[80vh] flex flex-col p-0">
+              <MissionDialog />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </main>
