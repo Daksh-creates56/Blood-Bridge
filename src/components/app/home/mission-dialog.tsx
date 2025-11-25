@@ -56,7 +56,8 @@ const features = [
         icon: Send,
         title: "Urgent Request Broadcast",
         description: "When time is critical, send out urgent requests for specific blood types. The system instantly notifies all nearby blood banks and potential donors within a specified radius, mobilizing help fast.",
-        image: placeholderData.placeholderImages.find(img => img.id === 'feature-requests')
+        image: placeholderData.placeholderImages.find(img => img.id === 'feature-requests'),
+        videoUrl: "https://cdn.pixabay.com/video/2016/11/04/6269-190550883_large.mp4"
     },
     {
         icon: BellRing,
