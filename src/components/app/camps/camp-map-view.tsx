@@ -43,8 +43,10 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
   const userMarkerRef = useRef<L.Marker | null>(null);
 
   useEffect(() => {
+    let mapContainer: HTMLDivElement | null = null;
     if (mapRef.current && !mapInstance.current) {
-      mapInstance.current = L.map(mapRef.current).setView(view.center, view.zoom);
+      mapContainer = mapRef.current;
+      mapInstance.current = L.map(mapContainer).setView(view.center, view.zoom);
 
       const streetLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -71,8 +73,8 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
     }
     
     const map = mapInstance.current;
-    const mapContainer = mapRef.current;
     
+    if (!mapContainer) mapContainer = mapRef.current;
     if (!mapContainer) return;
 
     const resizeObserver = new ResizeObserver(() => {
@@ -82,13 +84,15 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
     resizeObserver.observe(mapContainer);
     
     return () => {
-      resizeObserver.unobserve(mapContainer);
+      if (mapContainer) {
+        resizeObserver.unobserve(mapContainer);
+      }
     }
   }, []);
 
   // Handle view changes from parent (pan/zoom)
   useEffect(() => {
-    if (mapInstance.current && view) {
+    if (mapInstance.current && view && view.center && !isNaN(view.center[0]) && !isNaN(view.center[1])) {
       mapInstance.current.flyTo(view.center, view.zoom, {
         animate: true,
         duration: 1.5,
@@ -152,5 +156,3 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
 
   return <div ref={mapRef} className="h-full w-full" />;
 }
-
-    

@@ -65,6 +65,9 @@ function CampCard({ camp, onSelectCamp, isNearest, isSelected, onRegister }: { c
   );
 }
 
+const DEFAULT_CENTER: [number, number] = [19.0760, 72.8777];
+const DEFAULT_ZOOM = 12;
+
 export default function DonationCampsPage() {
   const [camps] = useLocalStorage<DonationCamp[]>('donationCamps', initialDonationCamps);
   const [selectedCamp, setSelectedCamp] = useState<DonationCamp | null>(null);
@@ -74,8 +77,8 @@ export default function DonationCampsPage() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [registrationCamp, setRegistrationCamp] = useState<DonationCamp | null>(null);
 
-  const initialCenter: [number, number] = useMemo(() => (camps.length > 0 ? camps[0].coordinates : [19.0760, 72.8777]), [camps]);
-  const [mapView, setMapView] = useState({ center: initialCenter, zoom: 12 });
+  const initialCenter: [number, number] = useMemo(() => (camps.length > 0 && camps[0].coordinates ? camps[0].coordinates : DEFAULT_CENTER), [camps]);
+  const [mapView, setMapView] = useState({ center: initialCenter, zoom: DEFAULT_ZOOM });
 
   const sortedCamps = useMemo(() => {
     return [...camps].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -124,8 +127,7 @@ export default function DonationCampsPage() {
 
         setNearestCamp(closestCamp);
         if (closestCamp) {
-          setSelectedCamp(closestCamp);
-          setMapView({ center: closestCamp.coordinates, zoom: 14 });
+          handleSelectCamp(closestCamp);
         } else {
           setMapView({ center: currentUserLocation, zoom: 14 });
         }
@@ -149,22 +151,20 @@ export default function DonationCampsPage() {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }, [sortedCamps]);
+  }, [sortedCamps, handleSelectCamp]);
   
   useEffect(() => {
     if(sortedCamps.length > 0 && !selectedCamp) {
-      const firstCamp = sortedCamps[0];
-      setSelectedCamp(firstCamp);
-      setMapView({ center: firstCamp.coordinates, zoom: 12 });
+      handleSelectCamp(sortedCamps[0]);
     }
-  }, [sortedCamps, selectedCamp]);
+  }, [sortedCamps, selectedCamp, handleSelectCamp]);
 
 
   return (
     <>
       <div className="flex flex-col h-[calc(100vh-theme(spacing.24))] w-full">
         {/* Map View */}
-        <div className="flex-shrink-0 h-[40vh] w-full rounded-lg overflow-hidden border">
+        <div className="flex-shrink-0 h-[40vh] md:h-[50vh] w-full rounded-lg overflow-hidden border">
           <CampMapView 
             camps={sortedCamps}
             selectedCamp={selectedCamp}
@@ -175,8 +175,8 @@ export default function DonationCampsPage() {
         </div>
 
         {/* Controls and Alerts */}
-        <div className="flex-shrink-0 p-4 w-full max-w-sm mx-auto space-y-2">
-            <Button onClick={findNearestCamp} disabled={isLocating} className="w-full shadow-lg">
+        <div className="flex-shrink-0 p-4 space-y-2">
+            <Button onClick={findNearestCamp} disabled={isLocating} className="w-full max-w-sm mx-auto flex shadow-lg">
               {isLocating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -190,7 +190,7 @@ export default function DonationCampsPage() {
               )}
             </Button>
             {locationError && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="max-w-sm mx-auto">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Location Error</AlertTitle>
                 <AlertDescription>{locationError}</AlertDescription>
@@ -232,5 +232,3 @@ export default function DonationCampsPage() {
     </>
   );
 }
-
-    
