@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { format } from 'date-fns';
-import { Map, Calendar, Clock, MapPin, Building } from 'lucide-react';
+import { Map, Calendar, Clock, MapPin, Building, LocateFixed, Loader2, XCircle } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialDonationCamps } from '@/lib/data';
 import type { DonationCamp } from '@/lib/types';
@@ -11,10 +11,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getDistance } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 interface CampDialogProps {
   camp: DonationCamp;
   isOpen: boolean;
+  userLocation: [number, number] | null;
 }
 
 const CampMapView = dynamic(() => import('@/components/app/camps/camp-map-view'), {
@@ -22,7 +25,7 @@ const CampMapView = dynamic(() => import('@/components/app/camps/camp-map-view')
   loading: () => <Skeleton className="h-[400px] w-full" />,
 });
 
-function CampLocationDialog({ camp, isOpen }: CampDialogProps) {
+function CampLocationDialog({ camp, isOpen, userLocation }: CampDialogProps) {
   return (
     <>
       <DialogHeader>
@@ -31,7 +34,7 @@ function CampLocationDialog({ camp, isOpen }: CampDialogProps) {
       <div className="space-y-4">
         <p className="text-muted-foreground">{camp.address}</p>
         <div className="h-[400px] w-full overflow-hidden rounded-md border">
-          {isOpen && <CampMapView key={camp.id} camp={camp} />}
+          {isOpen && <CampMapView key={camp.id} camp={camp} userLocation={userLocation} />}
         </div>
       </div>
     </>
@@ -39,12 +42,13 @@ function CampLocationDialog({ camp, isOpen }: CampDialogProps) {
 }
 
 
-function CampCard({ camp, onSelectCamp }: { camp: DonationCamp; onSelectCamp: (camp: DonationCamp) => void; }) {
+function CampCard({ camp, onSelectCamp, isNearest }: { camp: DonationCamp; onSelectCamp: (camp: DonationCamp) => void; isNearest: boolean; }) {
   const campDate = new Date(camp.date);
 
   return (
-    <Card className="flex flex-col">
+    <Card className={cn("flex flex-col", isNearest && "border-primary border-2 shadow-lg")}>
       <CardHeader>
+        {isNearest && <div className="text-sm font-semibold text-primary mb-2">Nearest Camp</div>}
         <CardTitle>{camp.name}</CardTitle>
         <CardDescription>Organized by {camp.organizer}</CardDescription>
       </CardHeader>
@@ -75,10 +79,70 @@ function CampCard({ camp, onSelectCamp }: { camp: DonationCamp; onSelectCamp: (c
 export default function DonationCampsPage() {
   const [camps] = useLocalStorage<DonationCamp[]>('donationCamps', initialDonationCamps);
   const [selectedCamp, setSelectedCamp] = useState<DonationCamp | null>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [nearestCamp, setNearestCamp] = useState<DonationCamp | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   const sortedCamps = useMemo(() => {
     return [...camps].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [camps]);
+
+  const findNearestCamp = () => {
+    setIsLocating(true);
+    setLocationError(null);
+    setNearestCamp(null);
+
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser.");
+      setIsLocating(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const currentUserLocation: [number, number] = [latitude, longitude];
+        setUserLocation(currentUserLocation);
+
+        let closestCamp: DonationCamp | null = null;
+        let minDistance = Infinity;
+
+        sortedCamps.forEach(camp => {
+          const distance = getDistance(
+            currentUserLocation[0],
+            currentUserLocation[1],
+            camp.coordinates[0],
+            camp.coordinates[1]
+          );
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestCamp = camp;
+          }
+        });
+
+        setNearestCamp(closestCamp);
+        setIsLocating(false);
+      },
+      (error) => {
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            setLocationError("You denied the request for Geolocation.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            setLocationError("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            setLocationError("The request to get user location timed out.");
+            break;
+          default:
+            setLocationError("An unknown error occurred.");
+            break;
+        }
+        setIsLocating(false);
+      }
+    );
+  };
 
   return (
     <>
@@ -88,11 +152,37 @@ export default function DonationCampsPage() {
           <h1 className="mt-4 text-3xl font-bold tracking-tight">Upcoming Donation Camps</h1>
           <p className="mt-2 text-muted-foreground">Find a camp near you and save a life.</p>
         </div>
+
+        <div className="flex flex-col items-center justify-center gap-4">
+            <Button onClick={findNearestCamp} disabled={isLocating}>
+              {isLocating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Locating...
+                </>
+              ) : (
+                <>
+                  <LocateFixed className="mr-2 h-4 w-4" />
+                  Find Nearest Camp
+                </>
+              )}
+            </Button>
+            {locationError && (
+              <p className="text-sm text-destructive flex items-center gap-2">
+                <XCircle className="h-4 w-4" /> {locationError}
+              </p>
+            )}
+        </div>
         
         {sortedCamps.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {sortedCamps.map(camp => (
-              <CampCard key={camp.id} camp={camp} onSelectCamp={setSelectedCamp} />
+              <CampCard 
+                key={camp.id} 
+                camp={camp} 
+                onSelectCamp={setSelectedCamp} 
+                isNearest={nearestCamp?.id === camp.id} 
+              />
             ))}
           </div>
         ) : (
@@ -105,7 +195,7 @@ export default function DonationCampsPage() {
 
       <Dialog open={!!selectedCamp} onOpenChange={(isOpen) => !isOpen && setSelectedCamp(null)}>
         <DialogContent className="max-w-3xl">
-          {selectedCamp && <CampLocationDialog camp={selectedCamp} isOpen={!!selectedCamp} />}
+          {selectedCamp && <CampLocationDialog camp={selectedCamp} isOpen={!!selectedCamp} userLocation={userLocation} />}
         </DialogContent>
       </Dialog>
     </>

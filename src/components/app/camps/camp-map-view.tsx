@@ -10,15 +10,31 @@ import type { DonationCamp } from '@/lib/types';
 
 interface MapViewProps {
   camp: DonationCamp;
+  userLocation?: [number, number] | null;
 }
 
-export default function CampMapView({ camp }: MapViewProps) {
+// Custom icon for user location
+const userIcon = new L.Icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+  className: 'leaflet-marker-user'
+});
+
+export default function CampMapView({ camp, userLocation }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
 
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
-      mapInstance.current = L.map(mapRef.current).setView(camp.coordinates, 16);
+        
+      const initialCenter = userLocation || camp.coordinates;
+      const initialZoom = userLocation ? 13 : 16;
+      mapInstance.current = L.map(mapRef.current).setView(initialCenter, initialZoom);
 
       const streetLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -43,10 +59,25 @@ export default function CampMapView({ camp }: MapViewProps) {
 
       L.control.layers(baseMaps).addTo(mapInstance.current);
 
+      // Add camp marker
       L.marker(camp.coordinates)
         .addTo(mapInstance.current)
         .bindPopup(`<b>${camp.name}</b><br/>${camp.location}`)
         .openPopup();
+        
+      // Add user location marker if available
+      if (userLocation) {
+        L.marker(userLocation).addTo(mapInstance.current)
+          .bindPopup('<b>Your Location</b>');
+
+        // Create a dotted line between user and camp
+        const latlngs = [userLocation, camp.coordinates];
+        L.polyline(latlngs, {color: 'hsl(var(--primary))', dashArray: '5, 10'}).addTo(mapInstance.current);
+
+        // Adjust map bounds to show both markers
+        mapInstance.current.fitBounds(L.latLngBounds(userLocation, camp.coordinates), { padding: [50, 50] });
+      }
+
     }
 
     return () => {
@@ -55,7 +86,7 @@ export default function CampMapView({ camp }: MapViewProps) {
         mapInstance.current = null;
       }
     };
-  }, [camp]);
+  }, [camp, userLocation]);
 
   return <div ref={mapRef} className="h-full w-full" />;
 }
