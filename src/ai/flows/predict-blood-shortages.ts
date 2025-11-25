@@ -66,12 +66,20 @@ const prompt = ai.definePrompt({
 
   The user wants to know about potential shortages for blood type '{{bloodType}}' over the '{{predictionPeriod}}'.
 
+  The available hospital locations in the system are:
+  - D Y Patil Hospital, Nerul
+  - Apollo Hospital, Belapur
+  - Fortis Hiranandani, Vashi
+  - MGM Hospital, Kamothe
+  - Reliance Hospital, Kopar Khairane
+
   Your task is to:
   1.  Analyze the available data trends for '{{bloodType}}'.
   2.  Based on your analysis, predict if a shortage is likely to occur within the '{{predictionPeriod}}'.
   3.  If a shortage is predicted, identify the potential deficit in units, determine the urgency level, and list the most likely affected locations.
-  4.  Provide an insightful 'analysisSummary' explaining your prediction in a point-wise format. Each point should be a separate string in an array. For example, if you predict a shortage, explain why (e.g., ["Historical data shows a 15% increase in demand for O- during the upcoming holiday season.", "A recent dip in donations has been observed in major urban centers."]). If no shortage is predicted, explain why the supply appears stable.
-  5.  If you predict a shortage for the requested blood type, you may also identify and include potential shortages for other related or commonly-used blood types in the 'predictedShortages' array if your analysis indicates a high probability.
+  4.  The 'affectedLocations' in your response MUST be a selection from the provided list of hospital locations.
+  5.  Provide an insightful 'analysisSummary' explaining your prediction in a point-wise format. Each point should be a separate string in an array. For example, if you predict a shortage, explain why (e.g., ["Historical data shows a 15% increase in demand for O- during the upcoming holiday season.", "A recent dip in donations has been observed in major urban centers."]). If no shortage is predicted, explain why the supply appears stable.
+  6.  If you predict a shortage for the requested blood type, you may also identify and include potential shortages for other related or commonly-used blood types in the 'predictedShortages' array if your analysis indicates a high probability.
 
   Urgency Level Rules:
   - Critical: Deficit > 50 units
