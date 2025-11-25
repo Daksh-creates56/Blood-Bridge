@@ -50,7 +50,7 @@ const features = [
         title: "Donation Camp Coordination",
         description: "Easily find and register for nearby blood donation camps. Our map-based interface shows you all active camps, their timings, and allows for seamless online booking to save a spot.",
         image: placeholderData.placeholderImages.find(img => img.id === 'feature-camps'),
-        videoUrl: "https://media.istockphoto.com/id/1491463133/video/illustrative-3d-animation-of-neural-network-concept-chatbot-artificial-intelligence-deep.mp4?s=mp4-640x640-is&k=20&c=GfH4iLh-gzyr0Ii2-LNoGFbzOdRspiD3pqzI9_oRgqg="
+        videoUrl: "https://cdn.pixabay.com/video/2020/09/13/49815-458438877_large.mp4"
     },
     {
         icon: Send,
