@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { Moon, Sun, Heart } from 'lucide-react';
+import { Moon, Sun, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -54,13 +54,13 @@ export default function SettingsPage() {
           <CardDescription>This application was made possible by the following creators.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center gap-6 text-center">
+          <div className="flex items-center justify-center gap-8 text-center">
             <div className="flex flex-col items-center gap-2">
-                <Heart className="h-8 w-8 text-primary" />
+                <Award className="h-10 w-10 text-primary" />
                 <p className="font-semibold text-lg">Daksh Ranjan Srivastava</p>
             </div>
             <div className="flex flex-col items-center gap-2">
-                <Heart className="h-8 w-8 text-primary" />
+                <Award className="h-10 w-10 text-primary" />
                 <p className="font-semibold text-lg">Nimish Bordiya</p>
             </div>
           </div>
