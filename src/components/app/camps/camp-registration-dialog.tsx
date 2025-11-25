@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -169,7 +170,7 @@ export function CampRegistrationDialog({ camp, isOpen, onOpenChange }: { camp: D
                             onBlur={onBlur}
                             name={name}
                             ref={ref}
-                            className="pl-9 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:pl-0"
+                            className="pl-9 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
                           />
                         </div>
                     </FormControl>
