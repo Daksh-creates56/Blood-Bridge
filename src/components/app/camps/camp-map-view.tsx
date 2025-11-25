@@ -6,19 +6,19 @@ import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import L from 'leaflet';
 import 'leaflet-defaulticon-compatibility';
 
-import type { Hospital } from '@/lib/types';
+import type { DonationCamp } from '@/lib/types';
 
 interface MapViewProps {
-  hospital: Hospital;
+  camp: DonationCamp;
 }
 
-export default function MapView({ hospital }: MapViewProps) {
+export default function CampMapView({ camp }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
 
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
-      mapInstance.current = L.map(mapRef.current).setView(hospital.coordinates, 16);
+      mapInstance.current = L.map(mapRef.current).setView(camp.coordinates, 16);
 
       const streetLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -43,9 +43,9 @@ export default function MapView({ hospital }: MapViewProps) {
 
       L.control.layers(baseMaps).addTo(mapInstance.current);
 
-      L.marker(hospital.coordinates)
+      L.marker(camp.coordinates)
         .addTo(mapInstance.current)
-        .bindPopup(`<b>${hospital.name}</b><br/>${hospital.address}`)
+        .bindPopup(`<b>${camp.name}</b><br/>${camp.location}`)
         .openPopup();
     }
 
@@ -55,7 +55,7 @@ export default function MapView({ hospital }: MapViewProps) {
         mapInstance.current = null;
       }
     };
-  }, [hospital]);
+  }, [camp]);
 
   return <div ref={mapRef} className="h-full w-full" />;
 }

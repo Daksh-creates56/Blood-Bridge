@@ -34,6 +34,10 @@ export default function RootLayout({
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossOrigin=""
         />
+         <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet-defaulticon-compatibility@0.1.2/dist/leaflet-defaulticon-compatibility.css"
+        />
       </head>
       <body className={`${inter.variable} ${poppins.variable} font-body antialiased`}>
         <Providers>

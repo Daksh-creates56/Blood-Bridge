@@ -30,6 +30,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+   webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.alias['@tanstack/react-table'] = require.resolve('@tanstack/react-table');
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
