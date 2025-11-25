@@ -63,7 +63,8 @@ const features = [
         icon: BellRing,
         title: "Active Request Alerts",
         description: "Stay informed with a live feed of all active urgent requests. Donors and blood banks can view details and immediately respond to fulfill critical needs in the community.",
-        image: placeholderData.placeholderImages.find(img => img.id === 'feature-alerts')
+        image: placeholderData.placeholderImages.find(img => img.id === 'feature-alerts'),
+        videoUrl: "https://cdn.pixabay.com/video/2015/08/08/90-135735293_large.mp4"
     },
     {
         icon: BarChart2,
