@@ -70,21 +70,19 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
       L.control.layers(baseMaps).addTo(mapInstance.current);
     }
     
-    // Invalidate size on container changes
     const map = mapInstance.current;
     const mapContainer = mapRef.current;
+    
+    if (!mapContainer) return;
+
     const resizeObserver = new ResizeObserver(() => {
       map?.invalidateSize();
     });
-    if (mapContainer) {
-      resizeObserver.observe(mapContainer);
-    }
+    
+    resizeObserver.observe(mapContainer);
     
     return () => {
-      if (mapContainer) {
-        resizeObserver.unobserve(mapContainer);
-      }
-      // Don't destroy map on unmount, just clean up observer
+      resizeObserver.unobserve(mapContainer);
     }
   }, []);
 
@@ -154,3 +152,5 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
 
   return <div ref={mapRef} className="h-full w-full" />;
 }
+
+    

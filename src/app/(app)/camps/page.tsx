@@ -164,7 +164,7 @@ export default function DonationCampsPage() {
     <>
       <div className="flex flex-col h-[calc(100vh-theme(spacing.24))] w-full">
         {/* Map View */}
-        <div className="flex-shrink-0 h-[400px] md:h-1/2 w-full rounded-lg overflow-hidden border">
+        <div className="flex-shrink-0 h-[40vh] w-full rounded-lg overflow-hidden border">
           <CampMapView 
             camps={sortedCamps}
             selectedCamp={selectedCamp}
@@ -232,3 +232,5 @@ export default function DonationCampsPage() {
     </>
   );
 }
+
+    
