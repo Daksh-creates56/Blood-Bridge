@@ -125,4 +125,6 @@ export const initialDonors: Donor[] = donorNames.map((name, index) => ({
   lastDonation: new Date(Date.now() - (30 + index * 15) * 24 * 60 * 60 * 1000).toISOString(),
   contact: {
     phone: `+91 987654321${index}`,
-    email: `${name.toLowerCase().
+    email: `${name.toLowerCase().replace(/ /g, '.')}@example.com`,
+  },
+}));

@@ -71,4 +71,7 @@ export const NAV_LINKS: NavItem[] = [
 
 export const SETTINGS_LINK: NavItem = {
   href: '/settings',
-  label
+  label: 'Settings',
+  icon: Settings,
+  tooltip: 'Settings',
+};
