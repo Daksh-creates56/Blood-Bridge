@@ -5,18 +5,23 @@ import { Star } from 'lucide-react';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Hospital } from '@/lib/types';
+import { useMemo } from 'react';
 
 interface LocationDialogProps {
   hospital?: Hospital;
   isOpen: boolean;
 }
 
-const MapView = dynamic(() => import('./map-view'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[400px] w-full" />,
-});
-
 export function LocationDialog({ hospital, isOpen }: LocationDialogProps) {
+  const MapView = useMemo(
+    () =>
+      dynamic(() => import('./map-view'), {
+        ssr: false,
+        loading: () => <Skeleton className="h-[400px] w-full" />,
+      }),
+    []
+  );
+
   if (!hospital) {
     return null;
   }
@@ -35,7 +40,7 @@ export function LocationDialog({ hospital, isOpen }: LocationDialogProps) {
           </div>
         </div>
         <div className="h-[400px] w-full rounded-md overflow-hidden border">
-           <MapView hospital={hospital} isOpen={isOpen} />
+           {isOpen && <MapView key={hospital.name} hospital={hospital} />}
         </div>
       </div>
     </>
