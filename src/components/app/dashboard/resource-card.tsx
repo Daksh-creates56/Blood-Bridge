@@ -48,26 +48,23 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
              <span className="text-sm text-muted-foreground"> units</span>
           </div>
         </div>
-        {resource.hospital ? (
-          <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-auto p-0 justify-start w-full text-left font-normal">
-                  <div className="flex items-start gap-3 text-muted-foreground">
-                    <MapPin className="mt-1 h-5 w-5 shrink-0" />
-                    <span className="text-sm text-wrap hover:underline">{resource.hospital.name}</span>
-                  </div>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl">
-              <LocationDialog hospital={resource.hospital} />
-            </DialogContent>
-          </Dialog>
-        ) : (
-            <div className="flex items-start gap-3 text-muted-foreground">
-              <MapPin className="mt-1 h-5 w-5 shrink-0" />
-              <span className="text-sm text-wrap">{resource.location}</span>
-            </div>
-        )}
+        <div className="flex items-start gap-3 text-muted-foreground">
+            <MapPin className="mt-1 h-5 w-5 shrink-0" />
+            {resource.hospital ? (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="text-sm text-left text-wrap hover:underline focus:outline-none focus:ring-2 focus:ring-ring rounded-sm">
+                    {resource.hospital.name}
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl">
+                  <LocationDialog hospital={resource.hospital} />
+                </DialogContent>
+              </Dialog>
+            ) : (
+                <span className="text-sm text-wrap">{resource.location}</span>
+            )}
+        </div>
       </CardContent>
       <CardFooter>
         <UpdateUnitsDialog resource={resource} onUpdate={onUpdate} />
