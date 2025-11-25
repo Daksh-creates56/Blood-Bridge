@@ -4,13 +4,7 @@ import { useState } from 'react';
 import { Droplets, MapPin, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Resource } from '@/lib/types';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { UpdateUnitsDialog } from './update-units-dialog';
 import { LocationDialog } from './location-dialog';
@@ -47,34 +41,35 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
             <span className="text-xl font-medium text-foreground">
               {resource.quantity}
             </span>
-             <span className="text-sm text-muted-foreground"> units</span>
+            <span className="text-sm text-muted-foreground"> units</span>
           </div>
         </div>
         <div className="flex items-start gap-3 text-muted-foreground">
-            <MapPin className="mt-1 h-5 w-5 shrink-0" />
-            {resource.hospital ? (
-              <>
-                <button 
-                  onClick={() => setIsLocationDialogOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-sm text-left text-wrap hover:underline focus:outline-none focus:ring-2 focus:ring-ring rounded-sm text-blue-500 hover:text-blue-400"
-                >
-                  <span>{resource.hospital.name}</span>
-                  <ExternalLink className="h-4 w-4" />
-                </button>
-                <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
-                  <DialogContent className="max-w-3xl">
-                    <LocationDialog hospital={resource.hospital} />
-                  </DialogContent>
-                </Dialog>
-              </>
-            ) : (
-                <span className="text-sm text-wrap">{resource.location}</span>
-            )}
+          <MapPin className="mt-1 h-5 w-5 shrink-0" />
+          {resource.hospital ? (
+            <button
+              onClick={() => setIsLocationDialogOpen(true)}
+              className="inline-flex items-center gap-1.5 text-sm text-left text-wrap text-blue-500 hover:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-ring rounded-sm"
+            >
+              <span>{resource.hospital.name}</span>
+              <ExternalLink className="h-4 w-4" />
+            </button>
+          ) : (
+            <span className="text-sm text-wrap">{resource.location}</span>
+          )}
         </div>
       </CardContent>
       <CardFooter>
         <UpdateUnitsDialog resource={resource} onUpdate={onUpdate} />
       </CardFooter>
+
+      {resource.hospital && (
+        <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
+          <DialogContent className="max-w-3xl">
+            <LocationDialog hospital={resource.hospital} isOpen={isLocationDialogOpen} />
+          </DialogContent>
+        </Dialog>
+      )}
     </Card>
   );
 }
