@@ -56,4 +56,6 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
       <CardFooter>
         <UpdateUnitsDialog resource={resource} onUpdate={onUpdate} />
       </CardFooter>
-    
+    </Card>
+  );
+}

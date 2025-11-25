@@ -16,4 +16,9 @@ export default function AppLayout({
       <div className="flex flex-1 flex-col">
         <AppHeader />
         <SidebarInset>
-          <main className="flex-1 p-4 sm
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
+  );
+}
