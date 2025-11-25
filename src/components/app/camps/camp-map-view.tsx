@@ -142,16 +142,14 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
         const selectedMarker = markersRef.current[selectedCamp.id];
         if (selectedMarker) {
           selectedMarker.setIcon(selectedIcon);
-          if (!userLocation) { // Only fly to camp if user location is not set
-            mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
-                animate: true,
-                duration: 1.5
-            });
-          }
+          mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
+              animate: true,
+              duration: 1.5
+          });
         }
       }
     }
-  }, [selectedCamp, userLocation]);
+  }, [selectedCamp]);
 
   return <div ref={mapRef} className="h-full w-full" />;
 }
