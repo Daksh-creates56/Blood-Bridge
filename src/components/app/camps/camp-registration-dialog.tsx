@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -72,7 +73,7 @@ export function CampRegistrationDialog({ camp }: CampRegistrationDialogProps) {
 
     const canvas = await html2canvas(ticketRef.current, { 
       scale: 3, 
-      backgroundColor: null, // Use transparent background
+      backgroundColor: '#ffffff', // Always use a white background for the PDF
       useCORS: true
     });
     const imgData = canvas.toDataURL('image/png');
@@ -119,7 +120,7 @@ export function CampRegistrationDialog({ camp }: CampRegistrationDialogProps) {
 
         {ticketData ? (
           <div className="space-y-4">
-            <div ref={ticketRef} className="bg-muted/30 p-4 border rounded-xl space-y-4 text-foreground">
+            <div ref={ticketRef} className="bg-card p-4 border rounded-xl space-y-4 text-card-foreground">
                 <div className="text-center">
                     <h3 className="font-bold text-lg text-primary">Blood Donation E-Ticket</h3>
                     <p className="font-semibold text-sm">{camp.name}</p>
@@ -129,7 +130,7 @@ export function CampRegistrationDialog({ camp }: CampRegistrationDialogProps) {
                 <div className="space-y-4">
                     <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground flex items-center gap-1"><User size={12} /> Name</p>
-                        <p className="font-semibold text-sm">{ticketData.name}</p>
+                        <p className="font-semibold text-sm break-words">{ticketData.name}</p>
                     </div>
                      <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Mail size={12}/> Email</p>
