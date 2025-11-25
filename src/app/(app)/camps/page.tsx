@@ -118,9 +118,7 @@ export default function DonationCampsPage() {
         });
 
         setNearestCamp(closestCamp);
-        if (closestCamp) {
-          setSelectedCamp(closestCamp);
-        }
+        // Do not auto-select, just highlight. Let user click.
         setIsLocating(false);
       },
       (error) => {
@@ -153,7 +151,7 @@ export default function DonationCampsPage() {
   return (
     <>
       <div className="flex flex-col h-[calc(100vh-theme(spacing.24))] gap-6">
-        <div className="w-full h-[40vh] md:h-[50vh] rounded-lg overflow-hidden border">
+        <div className="w-full h-[40vh] rounded-lg overflow-hidden border flex-shrink-0">
             <CampMapView 
                 camps={sortedCamps}
                 selectedCamp={selectedCamp}

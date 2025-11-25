@@ -70,18 +70,31 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
       };
 
       L.control.layers(baseMaps).addTo(mapInstance.current);
+    }
+    
+    return () => {
+      // Clean up map instance on component unmount
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
+    }
+  }, []);
 
-      // Add camp markers
+  // Add/update camp markers
+  useEffect(() => {
+    if (mapInstance.current) {
       camps.forEach(camp => {
+        if (!markersRef.current[camp.id]) {
           const marker = L.marker(camp.coordinates)
             .addTo(mapInstance.current!)
             .bindPopup(`<b>${camp.name}</b><br/>${camp.location}`);
           marker.on('click', () => onSelectCamp(camp));
           markersRef.current[camp.id] = marker;
+        }
       });
     }
-
-  }, [camps, onSelectCamp]); 
+  }, [camps, onSelectCamp]);
 
   // Handle user location marker and map view
   useEffect(() => {
@@ -91,9 +104,9 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
           } else {
               userMarkerRef.current = L.marker(userLocation, { icon: userIcon })
                 .addTo(mapInstance.current)
-                .bindPopup('<b>Your Location</b>');
+                .bindPopup('<b>Your Location</b>')
+                .openPopup();
           }
-          // Only fly to user's location when it's first determined
           mapInstance.current.flyTo(userLocation, 14, { animate: true, duration: 1.5 });
       }
   }, [userLocation]);
@@ -102,7 +115,6 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
   // Handle camp selection highlighting
   useEffect(() => {
     if (mapInstance.current) {
-      
       // Reset all icons to default
       Object.values(markersRef.current).forEach(marker => marker.setIcon(new L.Icon.Default()));
 
@@ -111,21 +123,20 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
         const selectedMarker = markersRef.current[selectedCamp.id];
         if (selectedMarker) {
           selectedMarker.setIcon(selectedIcon);
-          // Do not open popup automatically, to avoid covering user location
         }
       }
     }
   }, [selectedCamp]);
 
-  // Pan to selected camp if it's not the user's current nearest
+  // Pan to selected camp
   useEffect(() => {
-    if (mapInstance.current && selectedCamp && (!userLocation)) {
+    if (mapInstance.current && selectedCamp) {
         mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
             animate: true,
             duration: 1.5
         });
     }
-  }, [selectedCamp, userLocation])
+  }, [selectedCamp])
 
 
   return <div ref={mapRef} className="h-full w-full" />;

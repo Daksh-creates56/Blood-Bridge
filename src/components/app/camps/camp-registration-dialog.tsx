@@ -11,14 +11,57 @@ import type { DonationCamp } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, useFormField } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { GeneratedTicket } from './generated-ticket';
+import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 type Step = 'details' | 'camera' | 'ticket';
+
+const FileInput = () => {
+    const { name, onBlur, onChange } = useFormField();
+    const [fileName, setFileName] = useState('');
+
+    return (
+        <div className="relative">
+            <FileUp className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+                type="file"
+                id={name}
+                name={name}
+                accept="application/pdf"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                onBlur={onBlur}
+                onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                        setFileName(file.name);
+                    } else {
+                        setFileName('');
+                    }
+                    onChange(e.target.files);
+                }}
+            />
+            <Label 
+                htmlFor={name}
+                className={cn(
+                    "flex items-center w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    "cursor-pointer"
+                )}
+            >
+                <span className="pl-6 truncate text-muted-foreground">
+                    {fileName || 'Select a PDF file...'}
+                </span>
+            </Label>
+        </div>
+    );
+};
+
 
 export function CampRegistrationDialog({ camp, isOpen, onOpenChange }: { camp: DonationCamp; isOpen: boolean; onOpenChange: (open: boolean) => void }) {
   const [step, setStep] = useState<Step>('details');
@@ -157,22 +200,11 @@ export function CampRegistrationDialog({ camp, isOpen, onOpenChange }: { camp: D
               <FormField
                 control={step1Form.control}
                 name="idProof"
-                render={({ field: { onChange, onBlur, name, ref } }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>ID Proof (PDF only)</FormLabel>
                      <FormControl>
-                        <div className="relative">
-                          <FileUp className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input 
-                            type="file" 
-                            accept="application/pdf"
-                            onChange={(e) => onChange(e.target.files)} 
-                            onBlur={onBlur}
-                            name={name}
-                            ref={ref}
-                            className="pl-9 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                          />
-                        </div>
+                        <FileInput />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
