@@ -52,7 +52,14 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
              <span className="text-sm text-muted-foreground"> units</span>
           </div>
         </div>
-        <LocationDialog hospital={resource.hospital} />
+        {resource.hospital ? (
+          <LocationDialog hospital={resource.hospital} />
+        ) : (
+            <div className="flex items-start gap-3 text-muted-foreground">
+              <MapPin className="mt-1 h-5 w-5 shrink-0" />
+              <span className="text-sm text-wrap">{resource.location}</span>
+            </div>
+        )}
       </CardContent>
       <CardFooter>
         <UpdateUnitsDialog resource={resource} onUpdate={onUpdate} />

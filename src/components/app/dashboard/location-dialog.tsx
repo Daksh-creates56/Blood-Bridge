@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { Hospital } from '@/lib/types';
 
 interface LocationDialogProps {
-  hospital: Hospital;
+  hospital?: Hospital;
 }
 
 const MapView = dynamic(() => import('./map-view'), {
@@ -25,6 +25,10 @@ const MapView = dynamic(() => import('./map-view'), {
 
 export function LocationDialog({ hospital }: LocationDialogProps) {
   const [open, setOpen] = useState(false);
+
+  if (!hospital) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
