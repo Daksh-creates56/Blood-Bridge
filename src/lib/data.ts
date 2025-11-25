@@ -6,6 +6,16 @@ const locations = [
   'Fortis Hiranandani, Vashi',
   'MGM Hospital, Kamothe',
   'Reliance Hospital, Kopar Khairane',
+  'Terna Speciality Hospital, Nerul',
+  'Cloudnine Hospital, Vashi',
+  'Surya Hospital, Nerul',
+  'MPCT Hospital, Sanpada',
+  'Sterling Wockhardt Hospital, Vashi',
+  'Medicover Hospitals, Kharghar',
+  'Motherhood Hospital, Kharghar',
+  'Ashirwad Hospital, Seawoods',
+  'Lakshdeep Hospital, Vashi',
+  'Sai Snehdeep Hospital, Kopar Khairane'
 ];
 
 const bloodTypes: BloodType[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
