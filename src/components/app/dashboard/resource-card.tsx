@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Droplets, MapPin, ExternalLink, Activity } from 'lucide-react';
+import { Droplets, MapPin, ExternalLink } from 'lucide-react';
 import type { Resource } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,15 +21,15 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
   const statusStyles = {
     Available: {
       badge: 'success' as const,
-      gradient: 'from-green-50/50 to-background',
+      gradient: 'dark:from-green-900/20 from-green-50/50 to-background',
     },
     Low: {
       badge: 'warning' as const,
-      gradient: 'from-orange-50/50 to-background',
+      gradient: 'dark:from-orange-900/20 from-orange-50/50 to-background',
     },
     Critical: {
       badge: 'destructive' as const,
-      gradient: 'from-red-50/50 to-background',
+      gradient: 'dark:from-red-900/20 from-red-50/50 to-background',
     },
   };
 
