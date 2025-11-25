@@ -1,4 +1,4 @@
-import type { Resource, UrgentRequest, DonationCamp, Donor, BloodType, Hospital } from './types';
+import type { Resource, UrgentRequest, Donor, BloodType, Hospital } from './types';
 
 export const hospitals: Hospital[] = [
   { name: 'D Y Patil Hospital', address: 'Sector 5, Nerul, Navi Mumbai', coordinates: [19.041, 73.022], rating: 5 },
@@ -113,41 +113,6 @@ for (let i = 5; i < 305; i++) {
   };
   initialUrgentRequests.push(request);
 }
-
-
-// Generate mock donation camps
-export const initialDonationCamps: DonationCamp[] = [
-  {
-    id: 'camp-1',
-    name: 'Mega Blood Donation Drive',
-    organizer: 'Lions Club of Vashi',
-    location: 'Inorbit Mall, Vashi',
-    address: 'Inorbit Mall, Palm Beach Rd, Sector 30A, Vashi',
-    date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-    timings: '10:00 AM - 6:00 PM',
-    coordinates: [19.063, 73.003],
-  },
-  {
-    id: 'camp-2',
-    name: 'Community Health Camp',
-    organizer: 'Rotary Club of Belapur',
-    location: 'Urban Haat, Belapur',
-    address: 'CIDCO Urban Haat, Belapur',
-    date: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString(),
-    timings: '9:00 AM - 5:00 PM',
-    coordinates: [19.022, 73.033],
-  },
-  {
-    id: 'camp-3',
-    name: 'Youth For India Donation Camp',
-    organizer: 'NSS Unit, SIES GST',
-    location: 'SIES Graduate School of Technology, Nerul',
-    address: 'SIES GST, Sri Chandrasekarendra Saraswati Vidyapuram, Nerul',
-    date: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(),
-    timings: '11:00 AM - 4:00 PM',
-    coordinates: [19.044, 73.023],
-  },
-];
 
 const donorNames = [
   'Aarav Sharma', 'Vivaan Singh', 'Aditya Kumar', 'Vihaan Gupta', 'Arjun Patel',

@@ -32,17 +32,6 @@ export type UrgentRequest = {
   fulfilledBy?: string;
 };
 
-export type DonationCamp = {
-  id: string;
-  name: string;
-  organizer: string;
-  location: string;
-  address: string;
-  date: string; // ISO 8601 string
-  timings: string;
-  coordinates: [number, number];
-};
-
 export type Donor = {
   id: string;
   name: string;

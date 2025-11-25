@@ -3,7 +3,6 @@ import {
   Send,
   BellRing,
   History,
-  Map,
   BarChart2,
   Users,
   Settings,
@@ -48,12 +47,6 @@ export const NAV_LINKS: NavItem[] = [
     label: 'Request History',
     icon: History,
     tooltip: 'Request History',
-  },
-  {
-    href: '/camps',
-    label: 'Donation Camps',
-    icon: Map,
-    tooltip: 'Donation Camps',
   },
   {
     href: '/analytics',
