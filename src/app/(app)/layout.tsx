@@ -2,7 +2,6 @@
 import { SidebarProvider, Sidebar, SidebarInset } from '@/components/ui/sidebar';
 import { AppHeader } from '@/components/layout/header';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
-import { Chatbot } from '@/components/app/chatbot/chatbot';
 
 export default function AppLayout({
   children,
@@ -20,7 +19,6 @@ export default function AppLayout({
           <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
         </SidebarInset>
       </div>
-      <Chatbot />
     </SidebarProvider>
   );
 }

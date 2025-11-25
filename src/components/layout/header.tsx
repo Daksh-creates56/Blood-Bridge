@@ -2,6 +2,7 @@
 import { usePathname } from 'next/navigation';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { NAV_LINKS, SETTINGS_LINK } from '@/lib/constants';
+import { Chatbot } from '@/components/app/chatbot/chatbot';
 
 export function AppHeader() {
   const pathname = usePathname();
@@ -15,6 +16,9 @@ export function AppHeader() {
         {currentPage && (
           <h1 className="text-lg font-semibold tracking-tight sm:text-xl">{currentPage.label}</h1>
         )}
+      </div>
+       <div className="flex items-center gap-4">
+        <Chatbot />
       </div>
     </header>
   );

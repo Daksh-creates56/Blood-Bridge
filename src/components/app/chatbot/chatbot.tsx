@@ -8,7 +8,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { answerQuestion } from '@/app/actions/chat';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+
 
 type Message = {
   role: 'user' | 'model';
@@ -22,13 +28,11 @@ export function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const handleToggle = () => {
-    setIsOpen(prev => !prev);
-    if (!isOpen) {
+  const handleToggle = (openState: boolean) => {
+    setIsOpen(openState);
+    if (openState && messages.length === 0) {
         // Greet user on first open
-        if (messages.length === 0) {
-            setMessages([{ role: 'model', content: 'Hi! How can I help you today?' }]);
-        }
+        setMessages([{ role: 'model', content: 'Hi! How can I help you today?' }]);
     }
   };
 
@@ -66,26 +70,21 @@ export function Chatbot() {
   }, [messages]);
 
   return (
-    <>
-      <div className={cn("fixed bottom-6 right-6 z-50 transition-transform duration-300 ease-in-out", 
-        isOpen ? 'translate-y-full scale-0' : 'translate-y-0 scale-100'
-      )}>
-        <Button onClick={handleToggle} size="lg" className="rounded-full shadow-lg w-16 h-16">
-          <Bot className="h-7 w-7" />
+    <Popover open={isOpen} onOpenChange={handleToggle}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="icon">
+          <Bot className="h-5 w-5" />
           <span className="sr-only">Open Chat</span>
         </Button>
-      </div>
-
-      <div className={cn("fixed bottom-6 right-6 z-50 transition-transform duration-300 ease-in-out",
-        !isOpen ? 'translate-y-full scale-0' : 'translate-y-0 scale-100'
-      )}>
-        <Card className="w-[350px] h-[500px] flex flex-col shadow-2xl rounded-2xl">
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-[350px] p-0 rounded-2xl" sideOffset={10}>
+        <Card className="w-full h-[500px] flex flex-col shadow-2xl rounded-2xl border-0">
           <CardHeader className="flex flex-row items-center justify-between border-b p-4">
             <div className="flex items-center gap-3">
               <Bot className="h-6 w-6 text-primary" />
               <CardTitle className="text-lg font-semibold">Blood Bridge Assistant</CardTitle>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleToggle} className="h-8 w-8">
+            <Button variant="ghost" size="icon" onClick={() => handleToggle(false)} className="h-8 w-8">
               <X className="h-4 w-4" />
             </Button>
           </CardHeader>
@@ -134,13 +133,13 @@ export function Chatbot() {
                 className="flex-1"
                 disabled={isLoading}
               />
-              <Button type="submit" size="icon" disabled={isLoading}>
+              <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
                 <Send className="h-4 w-4" />
               </Button>
             </form>
           </CardFooter>
         </Card>
-      </div>
-    </>
+      </PopoverContent>
+    </Popover>
   );
 }
