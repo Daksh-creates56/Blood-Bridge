@@ -13,6 +13,7 @@ interface LocationDialogProps {
 }
 
 export function LocationDialog({ hospital, isOpen }: LocationDialogProps) {
+  // We still dynamically import to avoid SSR issues with Leaflet.
   const MapView = useMemo(
     () =>
       dynamic(() => import('./map-view'), {
@@ -40,6 +41,11 @@ export function LocationDialog({ hospital, isOpen }: LocationDialogProps) {
           </div>
         </div>
         <div className="h-[400px] w-full rounded-md overflow-hidden border">
+           {/* 
+             Conditionally render MapView based on isOpen.
+             The key prop ensures that if the dialog is re-used for different hospitals,
+             React treats it as a new component and it re-mounts correctly.
+           */}
            {isOpen && <MapView key={hospital.name} hospital={hospital} />}
         </div>
       </div>
