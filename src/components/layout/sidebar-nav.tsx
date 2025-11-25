@@ -25,10 +25,10 @@ export function SidebarNav() {
 
   return (
     <>
-      <SidebarHeader>
+      <SidebarHeader className="border-b">
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <HeartPulse className="h-7 w-7 text-primary" />
-          <span className="text-xl font-semibold tracking-tight">Blood Bridge</span>
+          <span className="text-xl font-headline font-semibold tracking-tight">Blood Bridge</span>
         </Link>
       </SidebarHeader>
       <SidebarContent className="p-2">
@@ -49,7 +49,7 @@ export function SidebarNav() {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
