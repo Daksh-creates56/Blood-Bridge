@@ -144,16 +144,16 @@ export default function DonationCampsPage() {
   }, [sortedCamps]);
   
   useEffect(() => {
-    if(sortedCamps.length > 0 && !selectedCamp && !nearestCamp) {
+    if(sortedCamps.length > 0 && !selectedCamp) {
       setSelectedCamp(sortedCamps[0]);
     }
-  }, [sortedCamps, selectedCamp, nearestCamp]);
+  }, [sortedCamps, selectedCamp]);
 
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-theme(spacing.24))]">
-          <div className="md:col-span-1 flex flex-col gap-4 h-full">
+      <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-theme(spacing.24))]">
+          <div className="w-full md:w-1/3 flex flex-col gap-4">
               <div className="flex-shrink-0 flex flex-col gap-4">
                    <Button onClick={findNearestCamp} disabled={isLocating} className="w-full">
                     {isLocating ? (
@@ -179,9 +179,9 @@ export default function DonationCampsPage() {
                   )}
               </div>
 
-              <ScrollArea className="flex-grow h-0">
+              <ScrollArea className="flex-grow pr-4">
                   {sortedCamps.length > 0 ? (
-                  <div className="space-y-4 pr-4">
+                  <div className="space-y-4">
                       {sortedCamps.map(camp => (
                       <CampCard 
                           key={camp.id} 
@@ -194,14 +194,14 @@ export default function DonationCampsPage() {
                       ))}
                   </div>
                   ) : (
-                  <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-20 text-center">
+                  <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-20 text-center h-full">
                       <h3 className="mt-4 text-2xl font-semibold tracking-tight">No Upcoming Camps</h3>
                       <p className="mt-2 text-muted-foreground">Please check back later.</p>
                   </div>
                   )}
               </ScrollArea>
           </div>
-          <div className="md:col-span-2 h-[400px] md:h-full rounded-lg overflow-hidden border">
+          <div className="w-full md:w-2/3 h-[400px] md:h-full rounded-lg overflow-hidden border">
               <CampMapView 
                   camps={sortedCamps}
                   selectedCamp={selectedCamp}
