@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -41,8 +41,14 @@ export default function PredictionsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [predictionResult, setPredictionResult] = useState<PredictBloodShortagesOutput | null>(null);
   const [formValues, setFormValues] = useState<z.infer<typeof predictionSchema> | null>(null);
+  const [generatedDate, setGeneratedDate] = useState('');
   const { toast } = useToast();
   const reportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Generate date only on the client-side to avoid hydration mismatch
+    setGeneratedDate(new Date().toLocaleDateString());
+  }, []);
 
   const form = useForm<z.infer<typeof predictionSchema>>({
     resolver: zodResolver(predictionSchema),
@@ -183,7 +189,7 @@ export default function PredictionsPage() {
             <div ref={reportRef} className="p-8 border rounded-lg bg-background text-foreground">
                 <header className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-primary">Blood Shortage Prediction Report</h1>
-                    <p className="text-muted-foreground text-sm">Generated on {new Date().toLocaleDateString()}</p>
+                    <p className="text-muted-foreground text-sm">Generated on {generatedDate}</p>
                 </header>
                 <Separator className="my-6" />
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-8 text-sm">
