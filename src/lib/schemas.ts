@@ -22,7 +22,9 @@ export const updateUnitsSchema = z.object({
 export const campRegistrationStep1Schema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters." }),
   age: z.coerce.number().min(18, { message: "You must be at least 18 to donate." }).max(65, { message: "You must be at most 65 to donate." }),
-  idProof: z.any().refine(file => file?.length == 1, 'ID Proof is required.'),
+  idProof: z.any()
+    .refine(files => files?.length == 1, 'ID Proof is required.')
+    .refine(files => files?.[0]?.type === 'application/pdf', 'Only PDF files are accepted.')
 });
 
 export const campRegistrationSchema = campRegistrationStep1Schema.extend({
