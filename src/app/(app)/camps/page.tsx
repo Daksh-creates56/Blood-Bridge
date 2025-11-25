@@ -27,13 +27,14 @@ function CampCard({ camp, onSelectCamp, isNearest, isSelected, onRegister }: { c
 
   return (
     <Card 
+      onClick={() => onSelectCamp(camp)}
       className={cn(
-        "flex flex-col transition-all duration-200 w-72 flex-shrink-0", 
+        "flex flex-col transition-all duration-200 cursor-pointer w-full", 
         isNearest && "border-primary border-2",
         isSelected ? "shadow-xl scale-105 border-primary" : "hover:shadow-lg"
       )}
     >
-      <div className="cursor-pointer" onClick={() => onSelectCamp(camp)}>
+      <div>
         <CardHeader>
           {isNearest && <div className="text-sm font-semibold text-primary mb-2">Nearest Camp</div>}
           <CardTitle>{camp.name}</CardTitle>
@@ -55,7 +56,7 @@ function CampCard({ camp, onSelectCamp, isNearest, isSelected, onRegister }: { c
         </CardContent>
       </div>
       <CardFooter>
-          <Button className="w-full" onClick={() => onRegister(camp)}>
+          <Button className="w-full" onClick={(e) => { e.stopPropagation(); onRegister(camp); }}>
             <FilePlus className="mr-2 h-4 w-4" />
             Register for this Camp
           </Button>
@@ -72,13 +73,17 @@ export default function DonationCampsPage() {
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [registrationCamp, setRegistrationCamp] = useState<DonationCamp | null>(null);
-  
+
+  const initialCenter: [number, number] = useMemo(() => (camps.length > 0 ? camps[0].coordinates : [19.0760, 72.8777]), [camps]);
+  const [mapView, setMapView] = useState({ center: initialCenter, zoom: 12 });
+
   const sortedCamps = useMemo(() => {
     return [...camps].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [camps]);
 
   const handleSelectCamp = useCallback((camp: DonationCamp) => {
     setSelectedCamp(camp);
+    setMapView({ center: camp.coordinates, zoom: 15 });
   }, []);
 
   const handleRegister = (camp: DonationCamp) => {
@@ -120,6 +125,9 @@ export default function DonationCampsPage() {
         setNearestCamp(closestCamp);
         if (closestCamp) {
           setSelectedCamp(closestCamp);
+          setMapView({ center: closestCamp.coordinates, zoom: 14 });
+        } else {
+          setMapView({ center: currentUserLocation, zoom: 14 });
         }
         setIsLocating(false);
       },
@@ -145,27 +153,29 @@ export default function DonationCampsPage() {
   
   useEffect(() => {
     if(sortedCamps.length > 0 && !selectedCamp) {
-      setSelectedCamp(sortedCamps[0]);
+      const firstCamp = sortedCamps[0];
+      setSelectedCamp(firstCamp);
+      setMapView({ center: firstCamp.coordinates, zoom: 12 });
     }
   }, [sortedCamps, selectedCamp]);
 
 
   return (
     <>
-      <div className="relative h-[calc(100vh-theme(spacing.24))] w-full overflow-hidden rounded-lg">
+      <div className="flex flex-col h-[calc(100vh-theme(spacing.24))] w-full">
         {/* Map View */}
-        <div className="absolute inset-0 z-0">
+        <div className="flex-shrink-0 h-[400px] md:h-1/2 w-full rounded-lg overflow-hidden border">
           <CampMapView 
             camps={sortedCamps}
             selectedCamp={selectedCamp}
             userLocation={userLocation}
             onSelectCamp={handleSelectCamp}
+            view={mapView}
           />
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center p-4 space-y-4">
-          {/* Button and Alerts */}
-          <div className="w-full max-w-sm">
+        {/* Controls and Alerts */}
+        <div className="flex-shrink-0 p-4 w-full max-w-sm mx-auto space-y-2">
             <Button onClick={findNearestCamp} disabled={isLocating} className="w-full shadow-lg">
               {isLocating ? (
                 <>
@@ -180,39 +190,36 @@ export default function DonationCampsPage() {
               )}
             </Button>
             {locationError && (
-              <Alert variant="destructive" className="mt-2">
+              <Alert variant="destructive">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Location Error</AlertTitle>
                 <AlertDescription>{locationError}</AlertDescription>
               </Alert>
             )}
-          </div>
-          
-          {/* Camp List */}
-          <div className="w-full">
-            <ScrollArea className="w-full">
-              {sortedCamps.length > 0 ? (
-              <div className="flex space-x-4 pb-4">
-                  {sortedCamps.map(camp => (
-                  <CampCard 
-                      key={camp.id} 
-                      camp={camp} 
-                      onSelectCamp={handleSelectCamp} 
-                      isNearest={nearestCamp?.id === camp.id} 
-                      isSelected={selectedCamp?.id === camp.id}
-                      onRegister={handleRegister}
-                  />
-                  ))}
-              </div>
-              ) : (
-              <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed bg-background/80 py-10 text-center">
-                  <h3 className="mt-4 text-2xl font-semibold tracking-tight">No Upcoming Camps</h3>
-                  <p className="mt-2 text-muted-foreground">Please check back later.</p>
-              </div>
-              )}
-            </ScrollArea>
-          </div>
         </div>
+          
+        {/* Camp List */}
+        <ScrollArea className="flex-grow w-full px-4">
+          {sortedCamps.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4">
+              {sortedCamps.map(camp => (
+                <CampCard 
+                  key={camp.id} 
+                  camp={camp} 
+                  onSelectCamp={handleSelectCamp} 
+                  isNearest={nearestCamp?.id === camp.id} 
+                  isSelected={selectedCamp?.id === camp.id}
+                  onRegister={handleRegister}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed bg-background/80 py-10 text-center">
+              <h3 className="mt-4 text-2xl font-semibold tracking-tight">No Upcoming Camps</h3>
+              <p className="mt-2 text-muted-foreground">Please check back later.</p>
+            </div>
+          )}
+        </ScrollArea>
       </div>
 
       {registrationCamp && (

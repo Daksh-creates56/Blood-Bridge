@@ -14,6 +14,7 @@ interface MapViewProps {
   selectedCamp: DonationCamp | null;
   userLocation?: [number, number] | null;
   onSelectCamp: (camp: DonationCamp) => void;
+  view: { center: [number, number], zoom: number };
 }
 
 const userIcon = new L.Icon({
@@ -35,7 +36,7 @@ const selectedIcon = new L.Icon({
 });
 
 
-export default function CampMapView({ camps, selectedCamp, userLocation, onSelectCamp }: MapViewProps) {
+export default function CampMapView({ camps, selectedCamp, userLocation, onSelectCamp, view }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const markersRef = useRef<Record<string, L.Marker>>({});
@@ -43,10 +44,7 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
 
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
-        
-      const initialCenter: [number, number] = camps.length > 0 ? camps[0].coordinates : [19.0760, 72.8777]; // Default to Mumbai
-      const initialZoom = 12;
-      mapInstance.current = L.map(mapRef.current).setView(initialCenter, initialZoom);
+      mapInstance.current = L.map(mapRef.current).setView(view.center, view.zoom);
 
       const streetLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -85,12 +83,19 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
       if (mapRef.current) {
         resizeObserver.unobserve(mapRef.current);
       }
-      if (map) {
-        map.remove();
-        mapInstance.current = null;
-      }
+      // Don't destroy map on unmount, just clean up observer
     }
   }, []);
+
+  // Handle view changes from parent (pan/zoom)
+  useEffect(() => {
+    if (mapInstance.current && view) {
+      mapInstance.current.flyTo(view.center, view.zoom, {
+        animate: true,
+        duration: 1.5,
+      });
+    }
+  }, [view]);
 
   // Add/update camp markers
   useEffect(() => {
@@ -115,7 +120,7 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
     }
   }, [camps, onSelectCamp]);
 
-  // Handle user location marker and map view
+  // Handle user location marker
   useEffect(() => {
       if(mapInstance.current && userLocation) {
           if (userMarkerRef.current) {
@@ -126,7 +131,6 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
                 .bindPopup('<b>Your Location</b>')
                 .openPopup();
           }
-          mapInstance.current.flyTo(userLocation, 14, { animate: true, duration: 1.5 });
       }
   }, [userLocation]);
 
@@ -141,11 +145,7 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
       if (selectedCamp) {
         const selectedMarker = markersRef.current[selectedCamp.id];
         if (selectedMarker) {
-          selectedMarker.setIcon(selectedIcon);
-          mapInstance.current.flyTo(selectedCamp.coordinates, 15, {
-              animate: true,
-              duration: 1.5
-          });
+          selectedMarker.setIcon(selectedIcon).openPopup();
         }
       }
     }
