@@ -72,13 +72,11 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
       L.control.layers(baseMaps).addTo(mapInstance.current);
     }
     
-    const map = mapInstance.current;
-    
     if (!mapContainer) mapContainer = mapRef.current;
     if (!mapContainer) return;
 
     const resizeObserver = new ResizeObserver(() => {
-      map?.invalidateSize();
+      mapInstance.current?.invalidateSize();
     });
     
     resizeObserver.observe(mapContainer);
@@ -112,12 +110,14 @@ export default function CampMapView({ camps, selectedCamp, userLocation, onSelec
       });
       
       camps.forEach(camp => {
-        if (!markersRef.current[camp.id]) {
-          const marker = L.marker(camp.coordinates)
-            .addTo(mapInstance.current!)
-            .bindPopup(`<b>${camp.name}</b><br/>${camp.location}`);
-          marker.on('click', () => onSelectCamp(camp));
-          markersRef.current[camp.id] = marker;
+        if (camp.coordinates && !isNaN(camp.coordinates[0]) && !isNaN(camp.coordinates[1])) {
+          if (!markersRef.current[camp.id]) {
+            const marker = L.marker(camp.coordinates)
+              .addTo(mapInstance.current!)
+              .bindPopup(`<b>${camp.name}</b><br/>${camp.location}`);
+            marker.on('click', () => onSelectCamp(camp));
+            markersRef.current[camp.id] = marker;
+          }
         }
       });
     }

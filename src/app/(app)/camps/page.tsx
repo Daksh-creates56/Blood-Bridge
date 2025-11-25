@@ -77,7 +77,13 @@ export default function DonationCampsPage() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [registrationCamp, setRegistrationCamp] = useState<DonationCamp | null>(null);
 
-  const initialCenter: [number, number] = useMemo(() => (camps.length > 0 && camps[0].coordinates ? camps[0].coordinates : DEFAULT_CENTER), [camps]);
+  const initialCenter = useMemo(() => {
+    if (camps.length > 0 && camps[0].coordinates) {
+      return camps[0].coordinates;
+    }
+    return DEFAULT_CENTER;
+  }, [camps]);
+
   const [mapView, setMapView] = useState({ center: initialCenter, zoom: DEFAULT_ZOOM });
 
   const sortedCamps = useMemo(() => {
@@ -85,8 +91,10 @@ export default function DonationCampsPage() {
   }, [camps]);
 
   const handleSelectCamp = useCallback((camp: DonationCamp) => {
-    setSelectedCamp(camp);
-    setMapView({ center: camp.coordinates, zoom: 15 });
+    if (camp && camp.coordinates && !isNaN(camp.coordinates[0]) && !isNaN(camp.coordinates[1])) {
+        setSelectedCamp(camp);
+        setMapView({ center: camp.coordinates, zoom: 15 });
+    }
   }, []);
 
   const handleRegister = (camp: DonationCamp) => {
@@ -129,7 +137,9 @@ export default function DonationCampsPage() {
         if (closestCamp) {
           handleSelectCamp(closestCamp);
         } else {
-          setMapView({ center: currentUserLocation, zoom: 14 });
+           if (currentUserLocation && !isNaN(currentUserLocation[0]) && !isNaN(currentUserLocation[1])) {
+              setMapView({ center: currentUserLocation, zoom: 14 });
+           }
         }
         setIsLocating(false);
       },
@@ -159,10 +169,9 @@ export default function DonationCampsPage() {
     }
   }, [sortedCamps, selectedCamp, handleSelectCamp]);
 
-
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-theme(spacing.24))] w-full">
+      <div className="flex flex-col h-[calc(100vh-var(--header-height,6rem))] w-full">
         {/* Map View */}
         <div className="flex-shrink-0 h-[40vh] md:h-[50vh] w-full rounded-lg overflow-hidden border">
           <CampMapView 
