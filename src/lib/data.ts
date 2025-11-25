@@ -1,6 +1,6 @@
 import type { Resource, UrgentRequest, DonationCamp, Donor, BloodType, Hospital } from './types';
 
-const hospitals: Hospital[] = [
+export const hospitals: Hospital[] = [
   { name: 'D Y Patil Hospital', address: 'Sector 5, Nerul, Navi Mumbai', coordinates: [19.041, 73.022], rating: 5 },
   { name: 'Apollo Hospital', address: 'Sector 23, CBD Belapur, Navi Mumbai', coordinates: [19.018, 73.03], rating: 5 },
   { name: 'Fortis Hiranandani', address: 'Sector 10A, Vashi, Navi Mumbai', coordinates: [19.068, 73.001], rating: 5 },

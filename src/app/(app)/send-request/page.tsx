@@ -1,13 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type * as z from 'zod';
-import { Send } from 'lucide-react';
+import { Send, MapPin } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
-import { initialUrgentRequests } from '@/lib/data';
-import type { UrgentRequest } from '@/lib/types';
+import { initialUrgentRequests, hospitals } from '@/lib/data';
+import type { UrgentRequest, Hospital } from '@/lib/types';
 import { urgentRequestSchema, bloodTypes, urgencyLevels, broadcastRadii } from '@/lib/schemas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,19 +30,35 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { LocationDialog } from '@/components/app/dashboard/location-dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 export default function SendRequestPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [requests, setRequests] = useLocalStorage<UrgentRequest[]>('urgentRequests', initialUrgentRequests);
+  const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   const form = useForm<z.infer<typeof urgentRequestSchema>>({
     resolver: zodResolver(urgentRequestSchema),
     defaultValues: {
       quantity: 1,
       broadcastRadius: '5km',
+      hospitalName: '',
     },
   });
+
+  const handleHospitalChange = (hospitalName: string) => {
+    const hospital = hospitals.find(h => h.name === hospitalName) || null;
+    setSelectedHospital(hospital);
+    form.setValue('hospitalName', hospitalName);
+    if (hospital) {
+      form.setValue('location', hospital.address);
+    } else {
+      form.setValue('location', '');
+    }
+  };
 
   function onSubmit(values: z.infer<typeof urgentRequestSchema>) {
     const newRequest: UrgentRequest = {
@@ -93,13 +110,14 @@ export default function SendRequestPage() {
                   <FormItem>
                     <FormLabel>Quantity (units)</FormLabel>
                     <FormControl>
-                      <Input type="number" min="1" {...field} />
+                      <Input type="number" min="1" {...field} onChange={e => field.onChange(Number(e.target.value))}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
             <FormField
               control={form.control}
               name="urgency"
@@ -118,28 +136,54 @@ export default function SendRequestPage() {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="hospitalName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hospital Name</FormLabel>
-                  <FormControl><Input placeholder="e.g., City General Hospital" {...field} /></FormControl>
+                  <FormLabel>Hospital</FormLabel>
+                  <Select onValueChange={handleHospitalChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger><SelectValue placeholder="Select a hospital" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {hospitals.map(hospital => <SelectItem key={hospital.name} value={hospital.name}>{hospital.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hospital Location</FormLabel>
-                  <FormControl><Input placeholder="e.g., 123 Main St, Anytown" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+            {selectedHospital && (
+               <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hospital Location</FormLabel>
+                    <div className="flex items-center gap-2">
+                       <FormControl>
+                        <Input readOnly {...field} className="flex-1 bg-muted" />
+                      </FormControl>
+                      <Dialog open={isMapOpen} onOpenChange={setIsMapOpen}>
+                        <DialogTrigger asChild>
+                           <Button variant="outline" size="icon">
+                            <MapPin className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl">
+                           <LocationDialog hospital={selectedHospital} isOpen={isMapOpen} />
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="broadcastRadius"
