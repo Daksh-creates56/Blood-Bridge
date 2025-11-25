@@ -150,13 +150,13 @@ export default function PredictionsPage() {
                 <Lightbulb className="h-8 w-8 text-blue-500 mt-1 flex-shrink-0" />
                 <div>
                   <CardTitle className="text-lg text-blue-900 dark:text-blue-300">AI Analysis Summary</CardTitle>
-                  <CardDescription asChild>
+                  <div className="text-sm text-muted-foreground">
                      <ul className="mt-2 list-disc pl-5 space-y-1 text-blue-800 dark:text-blue-400">
                       {predictionResult.analysisSummary.map((point, index) => (
                         <li key={index}>{point}</li>
                       ))}
                     </ul>
-                  </CardDescription>
+                  </div>
                 </div>
             </CardHeader>
           </Card>
