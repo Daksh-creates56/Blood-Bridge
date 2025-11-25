@@ -16,24 +16,29 @@ import { NAV_LINKS, SETTINGS_LINK } from '@/lib/constants';
 export function SidebarNav() {
   const pathname = usePathname();
 
-  const isActive = (href: string) => pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === '/dashboard') {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  }
 
   return (
     <>
       <SidebarHeader>
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <HeartPulse className="h-8 w-8 text-primary" />
-          <span className="text-xl font-semibold">Blood Bridge</span>
+        <Link href="/dashboard" className="flex items-center gap-2.5">
+          <HeartPulse className="h-7 w-7 text-primary" />
+          <span className="text-xl font-semibold tracking-tight">Blood Bridge</span>
         </Link>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="p-2">
         <SidebarMenu>
           {NAV_LINKS.map((link) => (
             <SidebarMenuItem key={link.href}>
               <SidebarMenuButton
                 asChild
                 isActive={isActive(link.href)}
-                tooltip={link.tooltip}
+                tooltip={{ children: link.tooltip, side: 'right', align: 'center' }}
               >
                 <Link href={link.href}>
                   <link.icon />
@@ -50,7 +55,7 @@ export function SidebarNav() {
             <SidebarMenuButton
               asChild
               isActive={isActive(SETTINGS_LINK.href)}
-              tooltip={SETTINGS_LINK.tooltip}
+              tooltip={{ children: SETTINGS_LINK.tooltip, side: 'right', align: 'center' }}
             >
               <Link href={SETTINGS_LINK.href}>
                 <SETTINGS_LINK.icon />

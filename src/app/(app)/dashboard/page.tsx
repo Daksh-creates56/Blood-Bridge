@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal, PlusCircle } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { initialResources } from '@/lib/data';
 import type { Resource, ResourceStatus } from '@/lib/types';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ResourceCard } from '@/components/app/dashboard/resource-card';
+import { Button } from '@/components/ui/button';
 
 export default function DashboardPage() {
   const [resources, setResources] = useLocalStorage<Resource[]>('resources', initialResources);
@@ -33,6 +34,7 @@ export default function DashboardPage() {
 
   const criticalCount = useMemo(() => resources.filter(r => r.status === 'Critical').length, [resources]);
   const lowCount = useMemo(() => resources.filter(r => r.status === 'Low').length, [resources]);
+  const availableCount = useMemo(() => resources.length - criticalCount - lowCount, [resources, criticalCount, lowCount]);
 
   const handleUpdateResource = (updatedResource: Resource) => {
     setResources(prevResources =>
@@ -41,7 +43,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -49,6 +51,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{resources.length}</div>
+            <p className="text-xs text-muted-foreground">Blood units across all locations</p>
           </CardContent>
         </Card>
         <Card>
@@ -57,6 +60,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{criticalCount}</div>
+             <p className="text-xs text-muted-foreground">Units with critical stock levels</p>
           </CardContent>
         </Card>
         <Card>
@@ -65,6 +69,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{lowCount}</div>
+             <p className="text-xs text-muted-foreground">Units with low stock levels</p>
           </CardContent>
         </Card>
          <Card>
@@ -72,36 +77,40 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium text-green-600">Available</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{resources.length - criticalCount - lowCount}</div>
+            <div className="text-2xl font-bold">{availableCount}</div>
+            <p className="text-xs text-muted-foreground">Units with sufficient stock</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            placeholder="Filter by blood type or location..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
-          <Select value={statusFilter} onValueChange={(value: ResourceStatus | 'All') => setStatusFilter(value)}>
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All</SelectItem>
-              <SelectItem value="Available">Available</SelectItem>
-              <SelectItem value="Low">Low</SelectItem>
-              <SelectItem value="Critical">Critical</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-4 flex flex-col gap-4 md:flex-row md:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Filter by blood type or location..."
+              className="pl-9"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+            <Select value={statusFilter} onValueChange={(value: ResourceStatus | 'All') => setStatusFilter(value)}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Statuses</SelectItem>
+                <SelectItem value="Available">Available</SelectItem>
+                <SelectItem value="Low">Low</SelectItem>
+                <SelectItem value="Critical">Critical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
 
       {filteredResources.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -110,10 +119,14 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-20 text-center">
+        <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-24 text-center">
             <h3 className="text-2xl font-semibold tracking-tight">No resources found</h3>
             <p className="mt-2 text-muted-foreground">Try adjusting your search or filters.</p>
+            <Button variant="outline" className="mt-4" onClick={() => { setSearchTerm(''); setStatusFilter('All');}}>
+              Clear Filters
+            </Button>
         </div>
       )}
     </div>
   );
+}

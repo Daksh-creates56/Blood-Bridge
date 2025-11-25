@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type * as z from 'zod';
+import { Edit } from 'lucide-react';
 
 import type { Resource } from '@/lib/types';
 import { updateUnitsSchema } from '@/lib/schemas';
@@ -106,7 +107,10 @@ export function UpdateUnitsDialog({ resource, onUpdate }: UpdateUnitsDialogProps
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="w-full">Update Units</Button>
+        <Button variant="outline" className="w-full">
+          <Edit className="mr-2 h-4 w-4" />
+          Update Units
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

@@ -184,4 +184,10 @@ export default function PredictionsPage() {
               <ShieldCheck className="h-12 w-12 text-green-500" />
               <h3 className="mt-4 text-2xl font-semibold tracking-tight">No Shortages Predicted</h3>
               <p className="mt-2 text-muted-foreground">Based on the provided data, the blood supply appears stable.</p>
-            
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
