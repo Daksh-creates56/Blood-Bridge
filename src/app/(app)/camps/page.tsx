@@ -78,7 +78,7 @@ export default function DonationCampsPage() {
   const [registrationCamp, setRegistrationCamp] = useState<DonationCamp | null>(null);
 
   const initialCenter = useMemo(() => {
-    if (camps.length > 0 && camps[0].coordinates) {
+    if (camps.length > 0 && camps[0].coordinates && !isNaN(camps[0].coordinates[0]) && !isNaN(camps[0].coordinates[1])) {
       return camps[0].coordinates;
     }
     return DEFAULT_CENTER;
@@ -138,10 +138,8 @@ export default function DonationCampsPage() {
         setNearestCamp(closestCamp);
         if (closestCamp) {
           handleSelectCamp(closestCamp);
-        } else {
-           if (currentUserLocation && !isNaN(currentUserLocation[0]) && !isNaN(currentUserLocation[1])) {
-              setMapView({ center: currentUserLocation, zoom: 14 });
-           }
+        } else if (currentUserLocation && !isNaN(currentUserLocation[0]) && !isNaN(currentUserLocation[1])) {
+           setMapView({ center: currentUserLocation, zoom: 14 });
         }
         setIsLocating(false);
       },
