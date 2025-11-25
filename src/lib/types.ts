@@ -2,12 +2,22 @@ export type BloodType = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
 export type ResourceStatus = 'Available' | 'Low' | 'Critical';
 export type UrgencyLevel = 'Critical' | 'High' | 'Moderate';
 export type RequestStatus = 'Active' | 'Fulfilled' | 'Expired';
+export type Coordinates = [number, number];
 
 export type Hospital = {
   name: string;
   address: string;
-  coordinates: [number, number];
+  coordinates: Coordinates;
   rating: number;
+};
+
+export type DonationCamp = {
+  id: string;
+  name: string;
+  address: string;
+  coordinates: Coordinates;
+  distance?: number;
+  timings: string;
 };
 
 export type Resource = {

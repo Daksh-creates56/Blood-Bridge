@@ -7,6 +7,7 @@ import {
   Users,
   Settings,
   FlaskConical,
+  HeartHandshake,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -23,6 +24,12 @@ export const NAV_LINKS: NavItem[] = [
     label: 'Dashboard',
     icon: LayoutDashboard,
     tooltip: 'Dashboard',
+  },
+  {
+    href: '/camps',
+    label: 'Donation Camps',
+    icon: HeartHandshake,
+    tooltip: 'Donation Camps',
   },
   {
     href: '/predictions',

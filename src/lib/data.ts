@@ -1,4 +1,4 @@
-import type { Resource, UrgentRequest, Donor, BloodType, Hospital } from './types';
+import type { Resource, UrgentRequest, Donor, BloodType, Hospital, DonationCamp } from './types';
 
 export const hospitals: Hospital[] = [
   { name: 'D Y Patil Hospital', address: 'Sector 5, Nerul, Navi Mumbai', coordinates: [19.041, 73.022], rating: 5 },
@@ -17,6 +17,14 @@ export const hospitals: Hospital[] = [
   { name: 'Lakshdeep Hospital', address: 'Sector 9, Vashi, Navi Mumbai', coordinates: [19.072, 72.999], rating: 5 },
   { name: 'Sai Snehdeep Hospital', address: 'Sector 1, Kopar Khairane', coordinates: [19.085, 73.005], rating: 5 }
 ];
+
+export const initialDonationCamps: DonationCamp[] = hospitals.map((hospital, index) => ({
+  id: `camp-${index + 1}`,
+  name: `${hospital.name} Donation Drive`,
+  address: hospital.address,
+  coordinates: hospital.coordinates,
+  timings: '9:00 AM - 5:00 PM',
+}));
 
 
 const bloodTypes: BloodType[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
