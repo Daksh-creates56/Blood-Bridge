@@ -1,6 +1,6 @@
 'use client';
 
-import { Droplets, MapPin, Edit } from 'lucide-react';
+import { Droplets, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Resource } from '@/lib/types';
 import {

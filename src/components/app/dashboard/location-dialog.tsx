@@ -33,10 +33,10 @@ export function LocationDialog({ hospital }: LocationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="h-auto p-0 justify-start w-full text-left">
+        <Button variant="ghost" size="sm" className="h-auto p-0 justify-start w-full text-left">
             <div className="flex items-start gap-3 text-muted-foreground">
               <MapPin className="mt-1 h-5 w-5 shrink-0" />
-              <span className="text-sm text-wrap">{hospital.name}</span>
+              <span className="text-sm text-wrap hover:underline">{hospital.name}</span>
             </div>
         </Button>
       </DialogTrigger>
