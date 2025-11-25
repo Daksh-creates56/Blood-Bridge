@@ -23,23 +23,17 @@ interface ResourceCardProps {
 
 export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
   const badgeVariant = {
-    Available: 'outline',
-    Low: 'secondary',
+    Available: 'success',
+    Low: 'warning',
     Critical: 'destructive',
   }[resource.status];
 
-  const badgeColor = {
-    Available: 'border-green-600 text-green-600',
-    Low: 'bg-orange-100 text-orange-600 border-orange-200 dark:bg-orange-900/50 dark:text-orange-400 dark:border-orange-800',
-    Critical: 'bg-red-100 text-red-600 border-red-200 dark:bg-red-900/50 dark:text-red-400 dark:border-red-800',
-  }[resource.status];
-
   return (
-    <Card className="flex flex-col h-full hover:shadow-md transition-shadow duration-300">
+    <Card className="flex flex-col h-full hover:shadow-lg transition-shadow duration-300 bg-card">
       <CardHeader>
         <div className="flex items-start justify-between">
-          <CardTitle className="text-4xl font-bold">{resource.bloodType}</CardTitle>
-          <Badge variant={badgeVariant as any} className={cn('text-xs font-semibold', badgeColor)}>
+          <CardTitle className="text-4xl font-bold text-primary">{resource.bloodType}</CardTitle>
+          <Badge variant={badgeVariant as any} className="text-xs font-semibold">
             {resource.status}
           </Badge>
         </div>
@@ -57,7 +51,7 @@ export function ResourceCard({ resource, onUpdate }: ResourceCardProps) {
         {resource.hospital ? (
           <Dialog>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-auto p-0 justify-start w-full text-left">
+                <Button variant="ghost" size="sm" className="h-auto p-0 justify-start w-full text-left font-normal">
                   <div className="flex items-start gap-3 text-muted-foreground">
                     <MapPin className="mt-1 h-5 w-5 shrink-0" />
                     <span className="text-sm text-wrap hover:underline">{resource.hospital.name}</span>
