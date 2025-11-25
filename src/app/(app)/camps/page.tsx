@@ -118,7 +118,6 @@ export default function DonationCampsPage() {
         });
 
         setNearestCamp(closestCamp);
-        // Do not auto-select, just highlight. Let user click.
         setIsLocating(false);
       },
       (error) => {
@@ -185,7 +184,7 @@ export default function DonationCampsPage() {
             )}
         </div>
         
-        <ScrollArea className="flex-grow">
+        <ScrollArea className="flex-grow pb-4">
           {sortedCamps.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-1">
               {sortedCamps.map(camp => (
