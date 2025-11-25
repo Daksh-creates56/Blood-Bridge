@@ -34,7 +34,8 @@ const features = [
         icon: LayoutDashboard,
         title: "Real-Time Dashboard",
         description: "Monitor blood inventory levels across all connected hospitals at a glance. Our intuitive dashboard provides a live overview of available units, helping you make quick and informed decisions.",
-        image: placeholderData.placeholderImages.find(img => img.id === 'feature-dashboard')
+        image: placeholderData.placeholderImages.find(img => img.id === 'feature-dashboard'),
+        videoUrl: "https://cdn.pixabay.com/video/2022/07/16/124333-730771399_large.mp4",
     },
     {
         icon: FlaskConical,
@@ -161,7 +162,15 @@ export function MissionDialog() {
                               <p className="text-base text-muted-foreground">{feature.description}</p>
                           </div>
                           <div className="relative aspect-video w-full overflow-hidden rounded-lg animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-                              {feature.image && (
+                              {feature.videoUrl ? (
+                                <video
+                                  src={feature.videoUrl}
+                                  autoPlay
+                                  loop
+                                  muted
+                                  className="absolute inset-0 w-full h-full object-cover"
+                                />
+                              ) : feature.image && (
                                   <Image
                                       src={feature.image.imageUrl}
                                       alt={feature.title}
