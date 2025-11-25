@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { HeartPulse, Droplets, ShieldCheck, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,34 +11,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { placeholderImages } from '@/lib/placeholder-images.json';
 
 export default function Home() {
-  const lightBg =
-    placeholderImages.find((img) => img.id === 'landing-light')?.imageUrl || '';
-  const darkBg =
-    placeholderImages.find((img) => img.id === 'landing-dark')?.imageUrl || '';
-
   return (
     <main className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background p-4">
       <div className="absolute inset-0 z-0">
-        <Image
-          src={lightBg}
-          alt="Abstract red and white flowing lines"
-          fill
-          className="object-cover dark:hidden animate-background-zoom"
-          priority
-          data-ai-hint="abstract red white"
+        <video
+          src="https://cdn.pixabay.com/video/2019/09/12/26799-359604172_large.mp4"
+          autoPlay
+          loop
+          muted
+          className="w-full h-full object-cover"
         />
-        <Image
-          src={darkBg}
-          alt="Abstract dark red and blue flowing lines"
-          fill
-          className="hidden object-cover dark:block animate-background-zoom"
-          priority
-          data-ai-hint="abstract dark red"
-        />
-        <div className="absolute inset-0 bg-background/50 backdrop-blur-md" />
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
       </div>
 
       <div 
