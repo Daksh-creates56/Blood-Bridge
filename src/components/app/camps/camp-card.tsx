@@ -1,9 +1,8 @@
 'use client';
 
-import { Walking, Clock } from 'lucide-react';
+import { PersonStanding, Clock } from 'lucide-react';
 import type { DonationCamp, Coordinates } from '@/lib/types';
 import { getDistance } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 
 interface CampCardProps {
   camp: DonationCamp;
@@ -25,7 +24,7 @@ export function CampCard({ camp, userLocation, onSelect }: CampCardProps) {
             </div>
              {distance && (
                 <div className="flex items-center gap-1 text-sm font-medium text-primary whitespace-nowrap">
-                    <Walking className="h-4 w-4" />
+                    <PersonStanding className="h-4 w-4" />
                     <span>{distance} km</span>
                 </div>
             )}
