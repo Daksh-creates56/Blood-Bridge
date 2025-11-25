@@ -31,10 +31,7 @@ const nextConfig: NextConfig = {
     ],
   },
    webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.alias['@tanstack/react-table'] = require.resolve('@tanstack/react-table');
-      config.externals.push('jspdf');
-    }
+    config.externals.push('jspdf');
     return config;
   },
 };
