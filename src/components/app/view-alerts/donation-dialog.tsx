@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +34,8 @@ import { useToast } from '@/hooks/use-toast';
 import type { UrgentRequest, Hospital } from '@/lib/types';
 import { hospitals } from '@/lib/data';
 import { LocationDialog } from '@/components/app/dashboard/location-dialog';
+import { getDistance } from '@/lib/utils';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface DonationDialogProps {
   request: UrgentRequest;
@@ -50,6 +52,27 @@ export function DonationDialog({ request, onFulfill }: DonationDialogProps) {
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const { toast } = useToast();
+
+  const requestingHospital = useMemo(() => {
+    return hospitals.find(h => h.name === request.hospitalName);
+  }, [request.hospitalName]);
+
+  const nearbyHospitals = useMemo(() => {
+    if (!requestingHospital) return [];
+    
+    const radius = parseInt(request.broadcastRadius.replace('km', ''));
+    
+    return hospitals.filter(h => {
+      if (h.name === requestingHospital.name) return false; // Exclude the requesting hospital itself
+      const distance = getDistance(
+        requestingHospital.coordinates[0],
+        requestingHospital.coordinates[1],
+        h.coordinates[0],
+        h.coordinates[1]
+      );
+      return distance <= radius;
+    });
+  }, [requestingHospital, request.broadcastRadius]);
 
   const form = useForm<z.infer<typeof donationSchema>>({
     resolver: zodResolver(donationSchema),
@@ -114,14 +137,14 @@ export function DonationDialog({ request, onFulfill }: DonationDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Your Location / Blood Bank</FormLabel>
-                     <Select onValueChange={handleHospitalSelect} defaultValue={field.value}>
+                     <Select onValueChange={handleHospitalSelect} defaultValue={field.value} disabled={nearbyHospitals.length === 0}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select your blood bank..." />
+                            <SelectValue placeholder={nearbyHospitals.length > 0 ? "Select a hospital in range..." : "No hospitals in range"} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {hospitals.map(hospital => (
+                          {nearbyHospitals.map(hospital => (
                             <SelectItem key={hospital.name} value={hospital.name}>
                               {hospital.name}
                             </SelectItem>
@@ -133,11 +156,19 @@ export function DonationDialog({ request, onFulfill }: DonationDialogProps) {
                 )}
               />
 
+              {nearbyHospitals.length === 0 && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    There are no registered blood banks within the {request.broadcastRadius} broadcast radius.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               {selectedHospital && (
                 <div className="p-3 bg-muted/50 rounded-md text-sm space-y-2">
                     <p className="font-semibold">{selectedHospital.name}</p>
                     <p className="text-muted-foreground">{selectedHospital.address}</p>
-                    <Button variant="outline" size="sm" onClick={() => setIsMapOpen(true)}>
+                    <Button type="button" variant="outline" size="sm" onClick={() => setIsMapOpen(true)}>
                       <MapPin className="mr-2 h-4 w-4" />
                       View on Map
                     </Button>
