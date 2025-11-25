@@ -10,24 +10,13 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { bloodTypes } from '@/lib/schemas';
+
+const predictionPeriods = ['Next 1 Week', 'Next 1 Month', 'Next 1 Year'] as const;
 
 const PredictBloodShortagesInputSchema = z.object({
-  historicalData: z
-    .string()
-    .describe(
-      'Historical data of blood inventory levels, donation rates, and usage patterns. This should be a CSV formatted string.'
-    ),
-  realTimeInventory: z
-    .string()
-    .describe(
-      'Real-time data of current blood inventory levels for each blood type. This should be a JSON formatted string.'
-    ),
-  alertThreshold: z
-    .number()
-    .default(0.1)
-    .describe(
-      'The threshold (as a percentage) at which a blood type is considered to be in shortage.'
-    ),
+  bloodType: z.enum(bloodTypes).describe('The blood type to predict shortages for.'),
+  predictionPeriod: z.enum(predictionPeriods).describe('The time period for the prediction.'),
 });
 export type PredictBloodShortagesInput = z.infer<
   typeof PredictBloodShortagesInputSchema
@@ -55,6 +44,7 @@ const PredictBloodShortagesOutputSchema = z.object({
   predictedShortages: z
     .array(PredictedShortageSchema)
     .describe('A list of blood types that are predicted to be in shortage.'),
+    analysisSummary: z.string().describe('A summary of the analysis performed by the AI.'),
 });
 export type PredictBloodShortagesOutput = z.infer<
   typeof PredictBloodShortagesOutputSchema
@@ -70,24 +60,25 @@ const prompt = ai.definePrompt({
   name: 'predictBloodShortagesPrompt',
   input: {schema: PredictBloodShortagesInputSchema},
   output: {schema: PredictBloodShortagesOutputSchema},
-  prompt: `You are an AI assistant that analyzes blood inventory data to predict potential shortages.
+  prompt: `You are an AI assistant that analyzes blood inventory data to predict potential shortages for a specific blood type over a given period.
 
-  Analyze the provided historical data and real-time inventory levels to identify blood types that are likely to be in shortage.
+  You have access to a vast (but simulated) dataset of historical blood inventory levels, donation rates, usage patterns, and seasonal trends for various locations.
 
-  Historical Data (CSV):
-  {{historicalData}}
+  The user wants to know about potential shortages for blood type '{{bloodType}}' over the '{{predictionPeriod}}'.
 
-  Real-time Inventory (JSON):
-  {{realTimeInventory}}
+  Your task is to:
+  1.  Analyze the available data trends for '{{bloodType}}'.
+  2.  Based on your analysis, predict if a shortage is likely to occur within the '{{predictionPeriod}}'.
+  3.  If a shortage is predicted, identify the potential deficit in units, determine the urgency level, and list the most likely affected locations.
+  4.  Provide a brief, insightful 'analysisSummary' explaining your prediction. For example, if you predict a shortage, explain why (e.g., "Based on historical data showing a 15% increase in demand for O- during the upcoming holiday season and a recent dip in donations, a critical shortage is anticipated..."). If no shortage is predicted, explain why the supply appears stable.
+  5.  If you predict a shortage for the requested blood type, you may also identify and include potential shortages for other related or commonly-used blood types in the 'predictedShortages' array if your analysis indicates a high probability.
 
-  Alert Threshold: {{alertThreshold}}
+  Urgency Level Rules:
+  - Critical: Deficit > 50 units
+  - High: Deficit between 20 and 50 units
+  - Moderate: Deficit < 20 units
 
-  Based on this data, predict which blood types will be in shortage and the urgency level of the shortage.
-  Also provide the predicted deficit in units for each blood type and the locations that will be affected.
-  Make sure the urgencyLevel field follows this rule:' +
-  'If the predictedDeficit is greater than 50 units, the urgency level should be Critical.' +
-  'If the predictedDeficit is between 20 and 50 units, the urgency level should be High.' +
-  'If the predictedDeficit is less than 20 units, the urgency level should be Moderate.'
+  Generate a response in the specified JSON format.
   `,
 });
 

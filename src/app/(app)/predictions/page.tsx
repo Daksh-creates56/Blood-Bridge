@@ -4,38 +4,27 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, FlaskConical, AlertTriangle, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Loader2, FlaskConical, AlertTriangle, ShieldCheck, ShieldAlert, Lightbulb } from 'lucide-react';
 import { predictBloodShortages, type PredictBloodShortagesOutput } from '@/app/actions/predict';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { bloodTypes } from '@/lib/schemas';
 
-const historicalDataDefault = `date,blood_type,donated,used,location
-2023-01-01,A+,10,8,Main Hospital
-2023-01-01,O-,5,12,City Clinic
-2023-01-02,B+,8,6,Main Hospital
-2023-01-02,A+,12,10,City Clinic
-2023-01-03,O-,3,15,Main Hospital`;
-
-const realTimeInventoryDefault = `{
-  "Main Hospital": {"A+": 25, "O-": 8, "B+": 30},
-  "City Clinic": {"A+": 40, "O-": 15, "B+": 22}
-}`;
+const predictionPeriods = ['Next 1 Week', 'Next 1 Month', 'Next 1 Year'] as const;
 
 const predictionSchema = z.object({
-  historicalData: z.string().min(1, 'Historical data is required.'),
-  realTimeInventory: z.string().min(1, 'Real-time inventory is required.'),
-  alertThreshold: z.coerce.number().min(0).max(1),
+  bloodType: z.enum(bloodTypes, { required_error: 'Please select a blood type.' }),
+  predictionPeriod: z.enum(predictionPeriods, { required_error: 'Please select a prediction period.' }),
 });
 
 const UrgencyIcon = ({ level }: { level: string }) => {
   switch (level) {
     case 'Critical':
-      return <AlertTriangle className="h-6 w-6 text-red-500" />;
+      return <AlertTriangle className="h-6 w-6 text-destructive" />;
     case 'High':
       return <ShieldAlert className="h-6 w-6 text-orange-500" />;
     case 'Moderate':
@@ -53,9 +42,8 @@ export default function PredictionsPage() {
   const form = useForm<z.infer<typeof predictionSchema>>({
     resolver: zodResolver(predictionSchema),
     defaultValues: {
-      historicalData: historicalDataDefault,
-      realTimeInventory: realTimeInventoryDefault,
-      alertThreshold: 0.2,
+      bloodType: 'A+',
+      predictionPeriod: 'Next 1 Month',
     },
   });
 
@@ -83,7 +71,7 @@ export default function PredictionsPage() {
         <CardHeader>
           <CardTitle>AI Blood Shortage Prediction</CardTitle>
           <CardDescription>
-            Use AI to analyze historical and real-time data to predict potential blood shortages.
+            Select a blood type and a time period to predict potential blood shortages using AI analysis.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -92,44 +80,49 @@ export default function PredictionsPage() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
-                  name="historicalData"
+                  name="bloodType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Historical Data (CSV)</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} rows={8} placeholder="date,blood_type,donated,used,location..." />
-                      </FormControl>
+                      <FormLabel>Blood Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a blood type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {bloodTypes.map(type => (
+                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
-                  name="realTimeInventory"
+                  name="predictionPeriod"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Real-time Inventory (JSON)</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} rows={8} placeholder={`{"Location": {"A+": 50, ...}}`} />
-                      </FormControl>
+                      <FormLabel>Prediction Period</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a time period" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                           {predictionPeriods.map(period => (
+                            <SelectItem key={period} value={period}>{period}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <FormField
-                control={form.control}
-                name="alertThreshold"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Alert Threshold</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </CardContent>
             <CardFooter>
               <Button type="submit" disabled={isLoading}>
@@ -151,39 +144,53 @@ export default function PredictionsPage() {
       {predictionResult && (
         <div>
           <h2 className="mb-4 text-2xl font-semibold">Prediction Results</h2>
+          
+           <Card className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800">
+            <CardHeader className="flex flex-row items-start gap-4">
+                <Lightbulb className="h-8 w-8 text-blue-500 mt-1" />
+                <div>
+                  <CardTitle className="text-lg text-blue-900 dark:text-blue-300">AI Analysis Summary</CardTitle>
+                  <CardDescription className="text-blue-800 dark:text-blue-400">{predictionResult.analysisSummary}</CardDescription>
+                </div>
+            </CardHeader>
+          </Card>
+
           {predictionResult.predictedShortages.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {predictionResult.predictedShortages.map((shortage, index) => (
                 <Card key={index} className={cn(
-                  shortage.urgencyLevel === 'Critical' && 'border-red-500',
+                  shortage.urgencyLevel === 'Critical' && 'border-destructive',
                   shortage.urgencyLevel === 'High' && 'border-orange-500',
+                  'border-2'
                 )}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-2xl">{shortage.bloodType}</CardTitle>
+                      <CardTitle className="text-3xl font-bold">{shortage.bloodType}</CardTitle>
                       <UrgencyIcon level={shortage.urgencyLevel} />
                     </div>
-                    <CardDescription>{shortage.urgencyLevel} Urgency</CardDescription>
+                    <CardDescription className="font-semibold">{shortage.urgencyLevel} Urgency</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    <p>
-                      Predicted Deficit: <span className="font-bold">{shortage.predictedDeficit} units</span>
+                  <CardContent className="space-y-3">
+                    <p className="text-sm">
+                      Predicted Deficit: <span className="font-bold text-lg">{shortage.predictedDeficit} units</span>
                     </p>
-                    <p>Affected Locations:</p>
-                    <ul className="list-disc pl-5">
-                      {shortage.affectedLocations.map((loc, i) => (
-                        <li key={i}>{loc}</li>
-                      ))}
-                    </ul>
+                    <div>
+                      <p className="text-sm font-medium">Affected Locations:</p>
+                      <ul className="list-disc pl-5 mt-1 text-sm text-muted-foreground">
+                        {shortage.affectedLocations.map((loc, i) => (
+                          <li key={i}>{loc}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-20 text-center">
+            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-20 text-center">
               <ShieldCheck className="h-12 w-12 text-green-500" />
               <h3 className="mt-4 text-2xl font-semibold tracking-tight">No Shortages Predicted</h3>
-              <p className="mt-2 text-muted-foreground">Based on the provided data, the blood supply appears stable.</p>
+              <p className="mt-2 text-muted-foreground">{predictionResult.analysisSummary || 'Based on the analysis, the blood supply appears stable for the selected period.'}</p>
             </div>
           )}
         </div>
