@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 import { bloodTypes } from '@/lib/schemas';
 
 const predictionPeriods = ['Next 1 Week', 'Next 1 Month', 'Next 1 Year'] as const;
@@ -44,7 +44,7 @@ const PredictBloodShortagesOutputSchema = z.object({
   predictedShortages: z
     .array(PredictedShortageSchema)
     .describe('A list of blood types that are predicted to be in shortage.'),
-    analysisSummary: z.string().describe('A summary of the analysis performed by the AI.'),
+    analysisSummary: z.array(z.string()).describe('A point-wise summary of the analysis performed by the AI.'),
 });
 export type PredictBloodShortagesOutput = z.infer<
   typeof PredictBloodShortagesOutputSchema
@@ -70,7 +70,7 @@ const prompt = ai.definePrompt({
   1.  Analyze the available data trends for '{{bloodType}}'.
   2.  Based on your analysis, predict if a shortage is likely to occur within the '{{predictionPeriod}}'.
   3.  If a shortage is predicted, identify the potential deficit in units, determine the urgency level, and list the most likely affected locations.
-  4.  Provide a brief, insightful 'analysisSummary' explaining your prediction. For example, if you predict a shortage, explain why (e.g., "Based on historical data showing a 15% increase in demand for O- during the upcoming holiday season and a recent dip in donations, a critical shortage is anticipated..."). If no shortage is predicted, explain why the supply appears stable.
+  4.  Provide an insightful 'analysisSummary' explaining your prediction in a point-wise format. Each point should be a separate string in an array. For example, if you predict a shortage, explain why (e.g., ["Historical data shows a 15% increase in demand for O- during the upcoming holiday season.", "A recent dip in donations has been observed in major urban centers."]). If no shortage is predicted, explain why the supply appears stable.
   5.  If you predict a shortage for the requested blood type, you may also identify and include potential shortages for other related or commonly-used blood types in the 'predictedShortages' array if your analysis indicates a high probability.
 
   Urgency Level Rules:

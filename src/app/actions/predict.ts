@@ -11,5 +11,3 @@ export async function predictBloodShortages(input: PredictBloodShortagesInput): 
     throw new Error("Failed to get prediction from AI flow.");
   }
 }
-
-export type { PredictBloodShortagesInput, PredictBloodShortagesOutput };

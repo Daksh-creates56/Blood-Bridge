@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2, FlaskConical, AlertTriangle, ShieldCheck, ShieldAlert, Lightbulb } from 'lucide-react';
-import { predictBloodShortages, type PredictBloodShortagesOutput } from '@/app/actions/predict';
+import { predictBloodShortages, type PredictBloodShortagesOutput } from '@/ai/flows/predict-blood-shortages';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -147,10 +147,16 @@ export default function PredictionsPage() {
           
            <Card className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800">
             <CardHeader className="flex flex-row items-start gap-4">
-                <Lightbulb className="h-8 w-8 text-blue-500 mt-1" />
+                <Lightbulb className="h-8 w-8 text-blue-500 mt-1 flex-shrink-0" />
                 <div>
                   <CardTitle className="text-lg text-blue-900 dark:text-blue-300">AI Analysis Summary</CardTitle>
-                  <CardDescription className="text-blue-800 dark:text-blue-400">{predictionResult.analysisSummary}</CardDescription>
+                  <CardDescription asChild>
+                     <ul className="mt-2 list-disc pl-5 space-y-1 text-blue-800 dark:text-blue-400">
+                      {predictionResult.analysisSummary.map((point, index) => (
+                        <li key={index}>{point}</li>
+                      ))}
+                    </ul>
+                  </CardDescription>
                 </div>
             </CardHeader>
           </Card>
@@ -159,9 +165,10 @@ export default function PredictionsPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {predictionResult.predictedShortages.map((shortage, index) => (
                 <Card key={index} className={cn(
-                  shortage.urgencyLevel === 'Critical' && 'border-destructive',
-                  shortage.urgencyLevel === 'High' && 'border-orange-500',
-                  'border-2'
+                  'border-2',
+                  shortage.urgencyLevel === 'Critical' && 'border-destructive bg-red-50/50 dark:bg-red-900/20',
+                  shortage.urgencyLevel === 'High' && 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/20',
+                  shortage.urgencyLevel === 'Moderate' && 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/20'
                 )}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -187,10 +194,12 @@ export default function PredictionsPage() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-20 text-center">
+             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-20 text-center">
               <ShieldCheck className="h-12 w-12 text-green-500" />
               <h3 className="mt-4 text-2xl font-semibold tracking-tight">No Shortages Predicted</h3>
-              <p className="mt-2 text-muted-foreground">{predictionResult.analysisSummary || 'Based on the analysis, the blood supply appears stable for the selected period.'}</p>
+              {predictionResult.analysisSummary.length > 0 && 
+                <p className="mt-2 text-muted-foreground">{predictionResult.analysisSummary[0]}</p>
+              }
             </div>
           )}
         </div>
