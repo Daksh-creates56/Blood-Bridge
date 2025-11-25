@@ -118,8 +118,8 @@ export default function DonationCampsPage() {
         });
 
         setNearestCamp(closestCamp);
-        if (closestCamp) {
-          setSelectedCamp(closestCamp);
+        if (closestCamp && !selectedCamp) {
+            setSelectedCamp(closestCamp);
         }
         setIsLocating(false);
       },
@@ -141,7 +141,7 @@ export default function DonationCampsPage() {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }, [sortedCamps]);
+  }, [sortedCamps, selectedCamp]);
   
   useEffect(() => {
     if(sortedCamps.length > 0 && !selectedCamp) {
@@ -153,7 +153,7 @@ export default function DonationCampsPage() {
   return (
     <>
       <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-theme(spacing.24))]">
-          <div className="w-full md:w-1/3 flex flex-col gap-4">
+          <div className="w-full md:w-1/3 lg:w-1/4 flex flex-col gap-4">
               <div className="flex-shrink-0 flex flex-col gap-4">
                    <Button onClick={findNearestCamp} disabled={isLocating} className="w-full">
                     {isLocating ? (
@@ -179,7 +179,7 @@ export default function DonationCampsPage() {
                   )}
               </div>
 
-              <ScrollArea className="flex-grow pr-4">
+              <ScrollArea className="flex-grow pr-4 -mr-4">
                   {sortedCamps.length > 0 ? (
                   <div className="space-y-4">
                       {sortedCamps.map(camp => (
@@ -201,7 +201,7 @@ export default function DonationCampsPage() {
                   )}
               </ScrollArea>
           </div>
-          <div className="w-full md:w-2/3 h-[400px] md:h-full rounded-lg overflow-hidden border">
+          <div className="w-full md:w-2/3 lg:w-3/4 h-[400px] md:h-full rounded-lg overflow-hidden border">
               <CampMapView 
                   camps={sortedCamps}
                   selectedCamp={selectedCamp}
